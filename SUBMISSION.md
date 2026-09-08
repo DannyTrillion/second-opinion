@@ -42,9 +42,9 @@ Transcript's in the repo.
 
 I didn't want to just claim it works.
 
-20 Binance markets: buying three green days in a row has never paid after fees. Three red days has, five times.
+Across 20 Binance markets, buying three green days in a row has never paid after fees. Three red days has, five times.
 
-Then I ran the gate over 5,568 days. The momentum trades it blocked lost. Its approvals were no better than average. Both in the README, untouched.
+Then I ran the gate over 5,568 days. The momentum trades it blocked lost. Its approvals were average. Both in the README, untouched.
 
 ---
 

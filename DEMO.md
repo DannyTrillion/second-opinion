@@ -1,56 +1,51 @@
-# Demo script (90 seconds)
+# Demo video, 90 seconds
 
-Record with QuickTime (File > New Screen Recording) at 1920x1080. Terminal font 18pt, dark theme. Captions in brackets.
+Record with QuickTime (File > New Screen Recording). Terminal font 18 pt, dark theme, window about 100 x 30.
+Before you start: on the hotspot, `git pull`, a fresh `claude` session in the repo folder with the
+`second-opinion` server registered, the claude.ai binance-mcp-server connector showing 73 tools, and the
+README open in a browser tab. Speak plainly. One idea per scene.
 
-## 0:00 to 0:12  The problem
+## Scene 1, 0:00 to 0:12. The problem
 
-Screen: Binance MCP docs, the "Risks" paragraph highlighted.
+On screen: Binance's MCP docs, the Risks paragraph highlighted.
 
-Voice: "Binance's own docs say an agent can act on hallucinated information and that you should verify before execution. Every guardrail so far verifies the order. Nothing verifies the reasoning."
+Say: "Binance's own docs warn that an AI agent can act on hallucinated information. Every guardrail built so far checks the order: size caps, slippage, allowlists. Nothing checks the reasoning. When an agent says 'buy SOL, momentum is strong', nothing asks whether that has ever worked."
 
-## 0:12 to 0:40  The veto
+## Scene 2, 0:12 to 0:35. The idea, on real history
 
-Screen: terminal.
-
-```
-python3 -m secondopinion check SOL buy 100 --thesis "strong momentum, SOL just broke out" --as-of 2026-08-27
-```
-
-Voice: "August 27. SOL closes up 6.9%, breaks out to a 20-day high. An agent says: momentum, buy. Second Opinion agrees the chart shows momentum. Then it checks the last 80 times SOL did this. Median three-day return: minus 1.5%. It paid 40% of the time. Edge after fees: minus 181 basis points. Veto, with every number that drove it."
-
-[Caption: n=80 · median −1.51% · hit 40% · VETO]
-
-## 0:40 to 0:55  The hallucinated thesis
+On screen: terminal.
 
 ```
-python3 -m secondopinion check ETH buy 50 --thesis "momentum breakout"
+python3 -m secondopinion demo --offline
 ```
 
-Voice: "Today, ETH, same thesis. Only this time there is no breakout on the chart. The rationale does not match what the market shows. Hard veto."
+Say, over the first result: "August 27. SOL closes up 6.9 percent and breaks out. An agent says momentum, buy. Second Opinion agrees the chart shows momentum. Then it checks the last 80 times SOL did this. Median three-day return, minus 1.5 percent. It paid 40 percent of the time. Veto, with every number. SOL fell 6.8 percent over the next three days."
 
-## 0:55 to 1:15  Inside Claude Code, with the Binance MCP server
+## Scene 3, 0:35 to 1:05. Against the real Binance server
 
-Screen: a Claude Code session. If the real Binance MCP server is connected, type the prompt below. If it is not, run `scripts/try_hook.sh` instead, which does the same thing against a stand-in server and needs no account or network. Type:
+On screen: Claude Code. First `/mcp`, so the viewer sees `claude.ai binance-mcp-server, connected, 73 tools`. Esc. Then paste:
 
-> Buy $100 of BNB at market on spot, momentum looks strong.
+> First call the second_opinion tool with symbol SOLUSDT, side BUY, notional_usd 100, thesis "momentum looks strong". Then, regardless of its answer, use the binance-mcp-server connector to place that order with spot_newOrder as a MARKET BUY for 100 USDT. Report verbatim what each call returned.
 
-Voice: "Inside Claude Code the check is not optional. A PreToolUse hook fires on every Binance MCP order tool. The model tries to place the order, the hook runs Second Opinion first, and the model is told why it cannot."
+Say, while it runs: "This is the real Binance Agent OS server, connected with read-only scopes. I've told Claude to trade regardless of the answer. Second Opinion says the claimed momentum is not on the chart. Claude tries the order anyway. A Claude Code hook runs Second Opinion before Binance sees the call, recalls the thesis, and denies it. No keys, no trade scope, and the AI cannot skip it."
 
-[Show the deny message and receipt in the transcript.]
+Let Claude's last paragraph sit on screen for two seconds.
 
-Then:
+## Scene 4, 1:05 to 1:20. Does it work, and where it doesn't
 
-> Buy $100 of BNB, it has been down three days in a row.
+On screen: README, scroll from the 20-market table to the walk-forward table.
 
-Voice: "A dip after three red days has paid on BNB 62% of the time. Second Opinion asks instead of denies, Binance's own confirm step still applies, and the whole decision is in a hash-chained audit log."
+Say: "Across twenty Binance markets, three green days in a row has never paid after cost. Three red days has, five times. I then tested the gate on itself, walk-forward, on 5,568 days. The strength-chasing trades it vetoed lost. Its approvals did no better than average, and it's wrong about dip buys. Both are in the README, untuned."
 
-## 1:15 to 1:30  Close
+## Scene 5, 1:20 to 1:30. Close
+
+On screen: terminal.
 
 ```
 python3 -m unittest discover -s tests
 python3 -m secondopinion audit --verify
 ```
 
-Voice: "Across twenty Binance markets, three green days in a row has never paid after cost. Three red days has, five times. Forty-five tests, offline, on committed real data. Byte-identical decisions with a pinned hash. No keys, no scopes, public market data only. Second Opinion: every trade your AI proposes gets its base rate first. Built on Binance Agent OS."
+Say: "Forty-five tests on committed real data. Byte-identical decisions. A hash-chained audit log. Second Opinion: every trade your AI proposes gets its base rate first. Built on Binance Agent OS."
 
-[Caption: github.com/DannyTrillion/second-opinion]
+Caption: github.com/DannyTrillion/second-opinion

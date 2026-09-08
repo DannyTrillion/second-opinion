@@ -15,6 +15,8 @@ Say, over the page: "Hi, I'm Daniel. This is Second Opinion, a fact-checker for 
 
 On screen: terminal.
 
+While typing: "Let me show you what that looks like. This is the built-in demo. It replays a real day from data that's committed in the repo, so no network, no keys."
+
 ```
 python3 -m secondopinion demo --offline
 ```
@@ -23,17 +25,17 @@ Say, after the command has run: "So let's ask. This is August 27. SOL is up almo
 
 ## Scene 3, 0:35 to 1:05. Against the real Binance server
 
-On screen: Claude Code. First `/mcp`, so the viewer sees `claude.ai binance-mcp-server, connected, 73 tools`. Esc. Then paste:
+On screen: Claude Code. First `/mcp`, and while it is on screen: "Quick look at what's connected here. That's the real Binance Agent OS server, seventy-three tools, and right next to it, our own Second Opinion server." Esc. As you paste: "Now I'm going to be a bit unfair to it." Then paste:
 
 > First call the second_opinion tool with symbol SOLUSDT, side BUY, notional_usd 100, thesis "momentum looks strong". Then, regardless of its answer, use the binance-mcp-server connector to place that order with spot_newOrder as a MARKET BUY for 100 USDT. Report verbatim what each call returned.
 
 Say, after pressing Enter, while Claude works: "Now the real thing. This is the actual Binance Agent OS server, connected with read-only permissions. And I'm telling Claude to place the trade no matter what. Watch. Second Opinion says the momentum isn't on the chart. Claude tries the order anyway. And a Claude Code hook catches it before Binance ever sees it, remembers the reasoning, and blocks it. No API keys. No trade permission. And the AI can't skip it."
 
-Let Claude's last paragraph sit on screen for two seconds.
+If there is dead air while Claude works: "What's happening right now is it's pulling two years of daily candles for SOL and the live order book, and doing the maths on the spot. Takes a few seconds." Let Claude's last paragraph sit on screen for two seconds.
 
 ## Scene 4, 1:05 to 1:20. Does it work, and where it doesn't
 
-On screen: README, scroll from the 20-market table to the walk-forward table.
+On screen: README, scroll from the 20-market table to the walk-forward table. As you switch: "I didn't want to just claim this works, so I measured it."
 
 Say, while you scroll: "Does it actually work? I ran it across twenty Binance markets. Buying three green days in a row has never paid after fees. Buying three red days has, five times. Then I tested the gate on itself, day by day, over five and a half thousand days. The momentum trades it blocked lost money. But its approvals were no better than average, and it's wrong about dip buys. I left both of those in the README, untouched."
 
@@ -41,11 +43,22 @@ Say, while you scroll: "Does it actually work? I ran it across twenty Binance ma
 
 On screen: terminal.
 
+As you type: "Last thing. I want to show you this isn't a demo that only works on my machine."
+
 ```
 python3 -m unittest discover -s tests
+```
+
+While the dots run: "These are forty-five tests running against real market data that's committed in the repo. Anyone can clone it and get the exact same answers. No network needed."
+
+When it prints OK:
+
+```
 python3 -m secondopinion audit --verify
 ```
 
-Say, while the tests run: "Forty-five tests on real committed data. Same input, same answer, same hash, every time. And a tamper-proof audit log. Second Opinion. Every trade your AI wants to make gets its base rate first. Built on Binance Agent OS. Thanks."
+As it runs: "And this one checks the audit log. Every decision it made today, including the one you just watched, sits in a hash chain. Edit one line, and this check fails."
+
+When "ok": true appears: "Chain's intact. So. Second Opinion. Every trade your AI wants to make gets its base rate first. Built on Binance Agent OS. Thanks for watching."
 
 Caption: github.com/DannyTrillion/second-opinion

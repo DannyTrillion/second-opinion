@@ -32,7 +32,7 @@ Then: yes, maybe, or no. With every number.
 
 Today I connected it to the real Binance Agent OS server, read-only, and told Claude to place the order no matter what.
 
-Claude tried. A Claude Code hook ran Second Opinion first, remembered the thesis, found no momentum on the chart, and blocked it before Binance ever saw it.
+Claude tried. A Claude Code hook ran Second Opinion first, found no momentum on the chart, and blocked it before Binance ever saw it.
 
 Transcript's in the repo.
 
@@ -44,13 +44,13 @@ I didn't want to just claim it works.
 
 20 Binance markets: buying three green days in a row has never paid after fees. Three red days has, five times.
 
-Then I ran the gate itself day by day over 5,568 days. The momentum trades it blocked lost. Its approvals were no better than average. Both are in the README, untouched.
+Then I ran the gate itself over 5,568 days. The momentum trades it blocked lost. Its approvals were no better than average. Both in the README, untouched.
 
 ---
 
 **5. What it's made of**
 
-Stock Python, no dependencies, no API keys, no LLM inside. 45 tests on real data that's committed in the repo, so anyone gets the same answers. Every decision hash-chained.
+Stock Python, no dependencies, no API keys, no LLM inside. 45 tests on real data committed in the repo, so anyone gets the same answers. Every decision hash-chained.
 
 Code: github.com/DannyTrillion/second-opinion
 Site: dannytrillion.github.io/second-opinion

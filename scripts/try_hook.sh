@@ -12,7 +12,7 @@ cat > "$P/.mcp.json" <<JSON
 {"mcpServers":{"binance-mcp-server":{"command":"python3","args":["$ROOT/examples/fake_binance_mcp.py"]}}}
 JSON
 cat > "$P/.claude/settings.json" <<JSON
-{"hooks":{"PreToolUse":[{"matcher":"mcp__binance-mcp-server__.*","hooks":[{"type":"command","command":"PYTHONPATH=$ROOT SECOND_OPINION_AUDIT=$P/audit.jsonl python3 -m secondopinion hook","timeout":60}]}]}}
+{"hooks":{"PreToolUse":[{"matcher":"mcp__(claude_ai_)?binance-mcp-server__.*","hooks":[{"type":"command","command":"PYTHONPATH=$ROOT SECOND_OPINION_AUDIT=$P/audit.jsonl python3 -m secondopinion hook","timeout":60}]}]}}
 JSON
 cd "$P"
 MODEL="${SECOND_OPINION_DEMO_MODEL:-sonnet}"   # any model your account can run; override with SECOND_OPINION_DEMO_MODEL

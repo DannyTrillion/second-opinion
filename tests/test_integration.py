@@ -173,6 +173,13 @@ class TestRealBinanceCatalog(unittest.TestCase):
         self.assertEqual(c(P + "spot_deleteOpenOrders"), "cancel")
         self.assertEqual(c(P + "wallet_userUniversalTransfer"), "transfer")
         self.assertEqual(c(P + "tool_execute"), "proxy")
+        self.assertEqual(c("mcp__claude_ai_binance-mcp-server__spot_newOrder"), "order")
+        import re
+        from secondopinion.__main__ import hook_settings
+        m = hook_settings("python3", "binance-mcp-server")["hooks"]["PreToolUse"][0]["matcher"]
+        self.assertTrue(re.fullmatch(m, "mcp__binance-mcp-server__spot_newOrder"))
+        self.assertTrue(re.fullmatch(m, "mcp__claude_ai_binance-mcp-server__spot_newOrder"))
+        self.assertFalse(re.fullmatch(m, "mcp__other__spot_newOrder"))
         for t in ("spot_getAccount", "spot_myTrades", "wallet_depositAddress", "wallet_withdrawHistory",
                   "futures_usds_positionInformationV2", "analysis_getTokenAiReport", "tool_search"):
             self.assertEqual(c(P + t), "read", t)

@@ -2,7 +2,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__binance-mcp-server__.*",
+        "matcher": "mcp__(claude_ai_)?binance-mcp-server__.*",
         "hooks": [
           {
             "type": "command",

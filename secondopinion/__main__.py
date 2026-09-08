@@ -139,7 +139,7 @@ def cmd_audit(a: argparse.Namespace) -> int:
 
 
 def hook_settings(python: str, server_name: str) -> dict:
-    return {"hooks": {"PreToolUse": [{"matcher": "mcp__%s__.*" % server_name,
+    return {"hooks": {"PreToolUse": [{"matcher": "mcp__(claude_ai_)?%s__.*" % server_name,
                                       "hooks": [{"type": "command", "command": "%s -m secondopinion hook" % python, "timeout": 60}]}]}}
 
 

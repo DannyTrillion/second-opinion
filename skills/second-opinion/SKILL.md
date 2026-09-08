@@ -20,7 +20,7 @@ You are about to propose or place a trade on Binance. Do not call an order tool 
 4. Read `primary` (the setup and its base rate: n, median forward return, hit rate, 95% interval) and `edge_after_cost_bps`.
 5. Act on the verdict:
    - `VETO`: do not place the order. Tell the user the setup, n, median, hit rate, and edge after cost, in one or two sentences.
-   - `CAUTION`: present the numbers and ask the user to confirm explicitly. Placing the order still goes through Binance's own confirm-before-execute step.
+   - `CAUTION`: do not place the order on your own. Present the numbers and ask the user to decide. If the Claude Code hook is installed it will deny a CAUTION order until the user has weighed in.
    - `APPROVE`: proceed to the Binance order tool and quote the receipt line (setup, n, median, edge) in your confirmation message.
 6. Never restate a base rate as a prediction. Say "the last 80 times" not "it will".
 

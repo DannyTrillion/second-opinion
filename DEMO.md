@@ -51,6 +51,6 @@ python3 -m unittest discover -s tests
 python3 -m secondopinion audit --verify
 ```
 
-Voice: "Across twenty Binance markets, three green days in a row has never paid after cost. Three red days has, five times. Thirty-eight tests, offline, on committed real data. Byte-identical decisions with a pinned hash. No keys, no scopes, public market data only. Second Opinion: every trade your AI proposes gets its base rate first. Built on Binance Agent OS."
+Voice: "Across twenty Binance markets, three green days in a row has never paid after cost. Three red days has, five times. Thirty-nine tests, offline, on committed real data. Byte-identical decisions with a pinned hash. No keys, no scopes, public market data only. Second Opinion: every trade your AI proposes gets its base rate first. Built on Binance Agent OS."
 
 [Caption: github.com/DannyTrillion/second-opinion]

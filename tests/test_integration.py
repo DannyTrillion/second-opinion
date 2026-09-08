@@ -86,6 +86,17 @@ class TestHookDecide(unittest.TestCase):
         self.assertIn("max_notional", h["permissionDecisionReason"])
         self.assertIn("5000", h["permissionDecisionReason"])
 
+    def test_caution_denies_by_default_and_asks_when_configured(self):
+        payload = {"tool_name": "mcp__binance-mcp-server__create_spot_order",
+                   "tool_input": {"symbol": "BTCUSDT", "side": "BUY", "quoteOrderQty": 100}}
+        # BTC on the fixture's last completed bar is a plain day: CAUTION
+        h = self.out(payload)
+        self.assertEqual(h["permissionDecision"], "deny")
+        self.assertIn("CAUTION", h["permissionDecisionReason"])
+        with mock.patch.dict(os.environ, {"SECOND_OPINION_CAUTION": "ask"}):
+            h = self.out(payload)
+        self.assertEqual(h["permissionDecision"], "ask")
+
     def test_advisory_mode_never_denies(self):
         with mock.patch.dict(os.environ, {"SECOND_OPINION_MODE": "advisory"}):
             h = self.out({"tool_name": "mcp__binance-mcp-server__create_spot_order",

@@ -8,6 +8,9 @@ Decisions:
   order we can parse       -> APPROVE=allow(+receipt)  CAUTION=ask  VETO=deny
   order we cannot parse    -> ask   (fail closed: never a silent allow on unknown shapes)
   SECOND_OPINION_MODE=advisory -> never deny; verdict attached as context instead
+  SECOND_OPINION_CAUTION=ask   -> CAUTION prompts the user instead of denying. Default is deny,
+                                  because in headless runs (claude -p, cron, CI) "ask" cannot
+                                  block and the order would go through.
 """
 import json
 import os
@@ -158,10 +161,16 @@ def decide(payload: Dict[str, Any]) -> Dict[str, Any]:
         return out("ask", "Second Opinion could not evaluate (%s). Confirm manually." % e)
 
     receipt = "Second Opinion (%s, notional %s):\n%s" % (order["how"], "$%.2f" % order["notional_usd"], v.summary())
+    caution_mode = os.environ.get("SECOND_OPINION_CAUTION", "deny").lower()
     if v.verdict == "APPROVE":
         return out("allow", context=receipt)
-    if v.verdict == "CAUTION" or advisory:
+    if advisory:
         return out("ask", receipt, context=receipt)
+    if v.verdict == "CAUTION":
+        if caution_mode == "ask":
+            return out("ask", receipt, context=receipt)
+        return out("deny", receipt + "\n\nCAUTION is not an approval. Show the user these numbers and let them decide; "
+                   "do not retry this order on your own.", context=receipt)
     return out("deny", receipt, context=receipt)
 
 

@@ -16,12 +16,13 @@ cat > "$P/.claude/settings.json" <<JSON
 JSON
 cd "$P"
 MODEL="${SECOND_OPINION_DEMO_MODEL:-sonnet}"   # any model your account can run; override with SECOND_OPINION_DEMO_MODEL
-PROMPT=${1:-"Using the binance-mcp-server tools: get the SOLUSDT ticker, then place a MARKET BUY spot order for 100 USDT of SOLUSDT because momentum looks strong. Report exactly what each tool call returned, including any denial message, verbatim."}
+PROMPT=${1:-"I am testing a guard hook against a stand-in exchange server; no real order can be placed. Call the binance-mcp-server tool create_spot_order exactly once with symbol SOLUSDT, side BUY, type MARKET, quoteOrderQty 100, reason 'momentum looks strong'. Then report verbatim what the call returned, including any denial message, and stop."}
 echo ">>> project: $P"
 echo ">>> model: $MODEL"
 echo ">>> prompt: $PROMPT"
 echo
-claude -p "$PROMPT" --model "$MODEL" --allowedTools "mcp__binance-mcp-server__get_ticker,mcp__binance-mcp-server__create_spot_order" --max-turns 8
+# CLAUDECODE is unset so the demo also works when launched from inside a Claude Code terminal
+env -u CLAUDECODE claude -p "$PROMPT" --model "$MODEL" --allowedTools "mcp__binance-mcp-server__get_ticker,mcp__binance-mcp-server__create_spot_order" --max-turns 8
 echo
 echo ">>> Second Opinion audit trail for this session:"
 SECOND_OPINION_AUDIT="$P/audit.jsonl" PYTHONPATH="$ROOT" python3 -m secondopinion audit --limit 5

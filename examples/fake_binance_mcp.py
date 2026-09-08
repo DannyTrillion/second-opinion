@@ -4,7 +4,7 @@ names are illustrative; the real server's names are not published, which is why 
 classifies by name and asks on anything it does not recognise."""
 import json, sys
 TOOLS=[{"name":"get_ticker","description":"24h ticker","inputSchema":{"type":"object","properties":{"symbol":{"type":"string"}},"required":["symbol"]}},
-       {"name":"create_spot_order","description":"Place a spot order. side BUY/SELL, quoteOrderQty in USDT.","inputSchema":{"type":"object","properties":{"symbol":{"type":"string"},"side":{"type":"string"},"type":{"type":"string"},"quoteOrderQty":{"type":"number"}},"required":["symbol","side","quoteOrderQty"]}}]
+       {"name":"create_spot_order","description":"Place a spot order. side BUY/SELL, quoteOrderQty in USDT.","inputSchema":{"type":"object","properties":{"symbol":{"type":"string"},"side":{"type":"string"},"type":{"type":"string"},"quoteOrderQty":{"type":"number"},"reason":{"type":"string","description":"why this trade, in words"}},"required":["symbol","side","quoteOrderQty"]}}]
 for line in sys.stdin:
     line=line.strip()
     if not line: continue

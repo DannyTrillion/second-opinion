@@ -32,7 +32,7 @@ Then: yes, maybe, or no. With every number.
 
 Today I connected it to the real Binance Agent OS server, read-only, and told Claude to place the order no matter what.
 
-Claude tried. A Claude Code hook ran Second Opinion first, found no momentum on the chart, and blocked it before Binance ever saw it.
+Claude tried. A Claude Code hook ran Second Opinion first, found no momentum on the chart, and blocked it before Binance saw it.
 
 Transcript's in the repo.
 
@@ -44,7 +44,7 @@ I didn't want to just claim it works.
 
 20 Binance markets: buying three green days in a row has never paid after fees. Three red days has, five times.
 
-Then I ran the gate itself over 5,568 days. The momentum trades it blocked lost. Its approvals were no better than average. Both in the README, untouched.
+Then I ran the gate over 5,568 days. The momentum trades it blocked lost. Its approvals were no better than average. Both in the README, untouched.
 
 ---
 

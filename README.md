@@ -166,7 +166,7 @@ python3 -m secondopinion install-hook            # prints the settings block
 python3 -m secondopinion install-hook --apply    # merges it into ~/.claude/settings.json, keeps a .bak
 ```
 
-Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first. The real order tools have no rationale field, so the hook recalls the thesis the model gave `second_opinion` for the same symbol and side in the last 15 minutes; the two entry points work together. [docs/HOOK_TRANSCRIPT.md](docs/HOOK_TRANSCRIPT.md) is a verbatim transcript of the hook vetoing a momentum buy inside a real Claude Code session.
+Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first. The real order tools have no rationale field, so the hook recalls the thesis the model gave `second_opinion` for the same symbol and side in the last 15 minutes; the two entry points work together. [docs/HOOK_TRANSCRIPT.md](docs/HOOK_TRANSCRIPT.md) is a verbatim transcript of the hook vetoing a momentum buy inside a real Claude Code session against a stand-in server, and [docs/HOOK_TRANSCRIPT_LIVE.md](docs/HOOK_TRANSCRIPT_LIVE.md) is the same hook denying a `spot_newOrder` call against the real Binance Agent OS server, connected with read-only scopes.
 
 Set `SECOND_OPINION_MODE=advisory` to make the hook never deny, only ask with the receipt attached.
 
@@ -218,7 +218,7 @@ Every decision, whether from the CLI, the MCP server, or the hook, is appended t
 - Spot pricing only. Futures funding is not modelled; a perp position's carry is a separate question.
 - The hook matches the real server's 73 tools by exact name ([docs/BINANCE_MCP_TOOLS.md](docs/BINANCE_MCP_TOOLS.md), observed through an authenticated connector on 8 September 2026, since Binance has not published the list). Names outside that catalog fall back to heuristics and, if still unrecognised, ask rather than allow. `scripts/probe_binance_mcp.py` re-fetches the list when Binance changes it.
 - Headless agents are the reason CAUTION denies. A hook decision of "ask" only holds when a human is at the keyboard; in `claude -p` the call proceeds. That was found by running `scripts/try_hook.sh`, and it is why the default is deny.
-- No live trade is in this repository. The demo shows the veto and approve paths on live data and the hook firing inside Claude Code; the account was not funded during the hackathon window.
+- No filled trade is in this repository. The hook was exercised against the real Agent OS server with read-only scopes and an unfunded sub-account, which is the safe way to prove a gate; a filled order would only prove that the server accepts orders.
 
 ## Repository
 
@@ -239,7 +239,7 @@ secondopinion/
   audit.py             hash-chained JSONL log
   __main__.py          CLI
 fixtures/              up to 1,000 real daily bars for 20 USDT pairs; a depth snapshot; exchange filters
-docs/                  EVIDENCE.md, EVALUATION.md, HOOK_TRANSCRIPT.md, BINANCE_MCP_TOOLS.md (the real server's 73 tools)
+docs/                  EVIDENCE.md, EVALUATION.md, HOOK_TRANSCRIPT.md, HOOK_TRANSCRIPT_LIVE.md, BINANCE_MCP_TOOLS.md
 skills/                Skills Hub packaging
 tests/                 45 tests, all offline
 hooks/                 Claude Code settings example

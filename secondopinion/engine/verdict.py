@@ -284,7 +284,7 @@ def evaluate(symbol: str, side: str, notional_usd: float, klines: List[list],
             reasons.append("%s: observed %s, limit %s (%s)%s" % (c.name, c.observed, c.limit, c.unit, (" - " + c.note) if c.note else ""))
     if verdict == APPROVE and primary:
         reasons.append("%s has paid after cost in this symbol's own history; edge %+.1f bps with the lower CI bound above zero" % (primary_key, edge))
-    if verdict == CAUTION and ci and not ci[0].passed:
+    if verdict == CAUTION and ci and not ci[0].passed and all(c.passed for c in soft):
         reasons.append("positive median edge but the 95% interval straddles zero; this is a coin flip with a small tilt")
 
     v = Verdict(

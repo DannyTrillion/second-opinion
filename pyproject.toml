@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "second-opinion"
+version = "0.1.0"
+description = "Deterministic base-rate and cost check for AI-proposed trades on Binance Agent OS"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = []
+
+[project.scripts]
+secondopinion = "secondopinion.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["secondopinion*"]

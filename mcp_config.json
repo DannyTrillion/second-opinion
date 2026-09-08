@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/mcp-config.json",
+  "mcpServers": {
+    "second-opinion": {
+      "command": "python3",
+      "args": ["-m", "secondopinion", "serve"],
+      "env": { "PYTHONPATH": "/ABSOLUTE/PATH/TO/second-opinion" }
+    },
+    "binance-mcp-server": {
+      "type": "http",
+      "url": "https://agent.binance.com/mcp/agentic"
+    }
+  }
+}

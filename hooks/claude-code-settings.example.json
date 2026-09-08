@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__binance-mcp-server__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/ABSOLUTE/PATH/TO/second-opinion python3 -m secondopinion hook",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

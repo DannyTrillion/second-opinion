@@ -1,0 +1,10 @@
+{
+  "horizon_days": 3,
+  "min_sample": 30,
+  "max_notional_usd": 1000,
+  "max_round_trip_bps": 60,
+  "max_data_age_hours": 30,
+  "fee_rate": 0.001,
+  "allowed_symbols": null,
+  "require_ci_positive": true
+}

@@ -216,7 +216,7 @@ Every decision, whether from the CLI, the MCP server, or the hook, is appended t
 - It does not predict. A base rate is what happened, not what will happen. A 62% hit rate on 109 occurrences is a tilt, not a promise, and the output says so.
 - Daily bars only, up to 1,000 of them. Intraday setups are out of scope; the MCP server's candle tool can be swapped in later.
 - Spot pricing only. Futures funding is not modelled; a perp position's carry is a separate question.
-- The hook classifies Binance MCP tools by name. Binance has not published the tool schema, so unknown names ask rather than allow. Once you have the real names from `tools/list`, tighten the matcher.
+- The hook classifies Binance MCP tools by name. Binance has not published the tool schema, so unknown names ask rather than allow. `scripts/probe_binance_mcp.py` asks the real endpoint for its `tools/list` and writes it to a file; with that in hand the matcher can be made exact.
 - Headless agents are the reason CAUTION denies. A hook decision of "ask" only holds when a human is at the keyboard; in `claude -p` the call proceeds. That was found by running `scripts/try_hook.sh`, and it is why the default is deny.
 - No live trade is in this repository. The demo shows the veto and approve paths on live data and the hook firing inside Claude Code; the account was not funded during the hackathon window.
 
@@ -244,6 +244,7 @@ tests/                 39 tests, all offline
 hooks/                 Claude Code settings example
 examples/              stand-in Binance MCP server for demos
 scripts/try_hook.sh    watch the hook fire in a real Claude Code session, no account needed
+scripts/probe_binance_mcp.py  list the real Agent OS server's tools and input fields
 ```
 
 ## License

@@ -166,7 +166,7 @@ python3 -m secondopinion install-hook            # prints the settings block
 python3 -m secondopinion install-hook --apply    # merges it into ~/.claude/settings.json, keeps a .bak
 ```
 
-Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first.
+Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first. [docs/HOOK_TRANSCRIPT.md](docs/HOOK_TRANSCRIPT.md) is a verbatim transcript of the hook vetoing a momentum buy inside a real Claude Code session.
 
 Set `SECOND_OPINION_MODE=advisory` to make the hook never deny, only ask with the receipt attached.
 
@@ -238,7 +238,7 @@ secondopinion/
   audit.py             hash-chained JSONL log
   __main__.py          CLI
 fixtures/              up to 1,000 real daily bars for 20 USDT pairs; a depth snapshot; exchange filters
-docs/                  EVIDENCE.md (what paid where), EVALUATION.md (walk-forward test of the gate)
+docs/                  EVIDENCE.md (what paid where), EVALUATION.md (walk-forward test of the gate), HOOK_TRANSCRIPT.md (the hook firing in Claude Code)
 skills/                Skills Hub packaging
 tests/                 39 tests, all offline
 hooks/                 Claude Code settings example

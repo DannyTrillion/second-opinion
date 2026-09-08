@@ -16,7 +16,7 @@ Second Opinion does, before the Binance MCP server executes:
 
 Real example, replayed on 27 Aug: SOL +6.9%, 20-day breakout, agent says momentum. Last 80 times: median 3-day return −1.5%, paid 40% of the time. Veto, with the numbers.
 
-Agent OS both ways: an MCP server any client can call, and a Claude Code hook that fires on every binance-mcp-server order tool so the check cannot be skipped. Fail closed. Approved orders still hit Binance's confirm-before-execute.
+Agent OS both ways: an MCP server any client can call, and a Claude Code hook that fires on every binance-mcp-server order tool so the check cannot be skipped. Fail closed. Verbatim transcript of it vetoing a momentum buy inside Claude Code is in the repo. Approved orders still hit Binance's confirm-before-execute.
 
 Across 20 Binance markets: three green days in a row has never paid after cost (lost in 8), three red days paid in 5 and lost in 0. Chasing strength is the setup to be most suspicious of, and it is the one AIs reach for by name.
 

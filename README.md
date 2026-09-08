@@ -84,12 +84,12 @@ same setup by horizon (median/hit): 1d +0.21%/54%, 3d -1.51%/40%, 7d -1.23%/46%
 | days with a specific setup on the chart | days | median 3d | hit rate | mean net of 30 bps |
 | --- | --- | --- | --- | --- |
 | every such day, no gate | 2,440 | +0.08% | 51% | +0.05% |
-| the days the gate did not veto | 1,480 | +0.34% | 53% | +0.13% |
-| vetoes on strength setups (momentum, breakout, overbought) | 742 | -0.64% | 45% | -0.20% |
-| vetoes on weakness setups (dips, oversold) | 218 | +0.51% | 55% | +0.37% |
+| the days the gate did not veto | 1,480 | +0.33% | 53% | +0.13% |
+| vetoes on strength setups (momentum, breakout, overbought) | 742 | -0.68% | 45% | -0.20% |
+| vetoes on weakness setups (dips, oversold) | 218 | +0.47% | 55% | +0.37% |
 | approvals | 109 | -0.04% | 50% | -0.62% |
 
-**What works.** The gate's core job is stopping an AI from chasing strength, and out of sample that is where it is right: the 742 strength-chasing trades it vetoed lost a median 0.64% and paid 45% of the time. The 559 vetoes on big up days and three green days alone lost a median 1.13%. Filtering only by the gate's vetoes raised the median outcome of setup days from +0.08% to +0.34%.
+**What works.** The gate's core job is stopping an AI from chasing strength, and out of sample that is where it is right: the 742 strength-chasing trades it vetoed lost a median 0.68% and paid 45% of the time. The 559 vetoes on big up days and three green days alone lost a median 1.13%. Filtering only by the gate's vetoes raised the median outcome of setup days from +0.08% to +0.33%.
 
 **What does not.** `APPROVE` is not a buy signal. Only 109 of 5,568 days cleared the confidence bar, and they did no better than average, because a lower-CI-above-cost test on small samples selects flukes. Read `APPROVE` as "no objection found." And the gate is wrong when it vetoes dip buys: those 218 days went on to pay. The base-rate evidence that dips pay is stronger than the gate's per-day confidence test admits.
 

@@ -30,7 +30,7 @@ Voice: "Today, ETH, same thesis. Only this time there is no breakout on the char
 
 ## 0:55 to 1:15  Inside Claude Code, with the Binance MCP server
 
-Screen: Claude Code session with `binance-mcp-server` connected. Type:
+Screen: a Claude Code session. If the real Binance MCP server is connected, type the prompt below. If it is not, run `scripts/try_hook.sh` instead, which does the same thing against a stand-in server and needs no account or network. Type:
 
 > Buy $100 of BNB at market on spot, momentum looks strong.
 

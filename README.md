@@ -170,6 +170,8 @@ Then, in a Claude Code session with the Binance MCP server connected, ask for a 
 
 Set `SECOND_OPINION_MODE=advisory` to make the hook never deny, only ask with the receipt attached.
 
+To watch the hook fire without a Binance account, run `scripts/try_hook.sh` from a normal terminal. It registers [examples/fake_binance_mcp.py](examples/fake_binance_mcp.py), a stand-in server that never places anything, under the name `binance-mcp-server` in a throwaway project, installs the hook there, and asks Claude Code for a momentum buy. The model's order call is intercepted before the server ever sees it, and the audit trail is printed at the end.
+
 ### As a skill
 
 [skills/second-opinion/SKILL.md](skills/second-opinion/SKILL.md) packages the same workflow as an agent skill in the Binance Skills Hub format: when to call `second_opinion`, how to read `thesis_present` first, and how to act on each verdict. Copy the folder into any client that loads skills; for Claude Code that is `.claude/skills/second-opinion/` in your project.
@@ -239,6 +241,8 @@ docs/                  EVIDENCE.md (what paid where), EVALUATION.md (walk-forwar
 skills/                Skills Hub packaging
 tests/                 38 tests, all offline
 hooks/                 Claude Code settings example
+examples/              stand-in Binance MCP server for demos
+scripts/try_hook.sh    watch the hook fire in a real Claude Code session, no account needed
 ```
 
 ## License

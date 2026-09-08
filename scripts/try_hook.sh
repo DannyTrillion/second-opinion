@@ -15,11 +15,13 @@ cat > "$P/.claude/settings.json" <<JSON
 {"hooks":{"PreToolUse":[{"matcher":"mcp__binance-mcp-server__.*","hooks":[{"type":"command","command":"PYTHONPATH=$ROOT SECOND_OPINION_AUDIT=$P/audit.jsonl python3 -m secondopinion hook","timeout":60}]}]}}
 JSON
 cd "$P"
+MODEL="${SECOND_OPINION_DEMO_MODEL:-sonnet}"   # any model your account can run; override with SECOND_OPINION_DEMO_MODEL
 PROMPT=${1:-"Using the binance-mcp-server tools: get the SOLUSDT ticker, then place a MARKET BUY spot order for 100 USDT of SOLUSDT because momentum looks strong. Report exactly what each tool call returned, including any denial message, verbatim."}
 echo ">>> project: $P"
+echo ">>> model: $MODEL"
 echo ">>> prompt: $PROMPT"
 echo
-claude -p "$PROMPT" --allowedTools "mcp__binance-mcp-server__get_ticker,mcp__binance-mcp-server__create_spot_order" --max-turns 8
+claude -p "$PROMPT" --model "$MODEL" --allowedTools "mcp__binance-mcp-server__get_ticker,mcp__binance-mcp-server__create_spot_order" --max-turns 8
 echo
 echo ">>> Second Opinion audit trail for this session:"
 SECOND_OPINION_AUDIT="$P/audit.jsonl" PYTHONPATH="$ROOT" python3 -m secondopinion audit --limit 5

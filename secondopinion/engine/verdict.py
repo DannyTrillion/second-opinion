@@ -8,7 +8,7 @@ import json
 from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional
 
-from .baserate import BaseRate, all_base_rates
+from .baserate import BaseRate, all_base_rates, base_rate_for
 from .cost import CostEstimate, estimate_cost, DEFAULT_TAKER_FEE
 from .setups import SetupMatrix, SETUP_BY_KEY
 
@@ -96,6 +96,7 @@ class Verdict:
     claimed_setups: List[str]
     primary_setup: Optional[str]
     primary: Optional[Dict[str, Any]]
+    primary_by_horizon: Dict[str, Dict[str, Any]]
     baseline: Dict[str, Any]
     all_setups: Dict[str, Dict[str, Any]]
     cost: Dict[str, Any]
@@ -120,6 +121,12 @@ class Verdict:
             lines.append("setup %s: n=%d, median %+.2f%%, hit %.0f%%, CI95 median [%+.2f%%, %+.2f%%]" % (
                 self.primary_setup, p["n"], 100 * p["median_fwd"], 100 * p["hit_rate"],
                 100 * p["ci95_median_low"], 100 * p["ci95_median_high"]))
+        if self.primary_by_horizon:
+            parts = []
+            for h, r in sorted(self.primary_by_horizon.items(), key=lambda kv: int(kv[0])):
+                if r.get("n"):
+                    parts.append("%sd %+.2f%%/%.0f%%" % (h, 100 * r["median_fwd"], 100 * r["hit_rate"]))
+            lines.append("same setup by horizon (median/hit): " + ", ".join(parts))
         b = self.baseline
         if b.get("n"):
             lines.append("all days: n=%d, median %+.2f%%, hit %.0f%%" % (b["n"], 100 * b["median_fwd"], 100 * b["hit_rate"]))
@@ -229,6 +236,13 @@ def evaluate(symbol: str, side: str, notional_usd: float, klines: List[list],
         primary_key, primary = "ALL_DAYS", baseline
         reasons.append("no distinctive setup on the signal bar; judged against the unconditional base rate")
 
+    # ---- the same setup at other horizons, so a 3-day coin flip cannot hide a 7-day edge (or loss)
+    by_horizon: Dict[str, Dict[str, Any]] = {}
+    if primary_key:
+        idx = list(range(0, signal_i)) if primary_key == "ALL_DAYS" else [i for i in range(0, signal_i) if matrix.flags[primary_key][i]]
+        for h in sorted({1, 3, 7, policy.horizon_days}):
+            by_horizon[str(h)] = base_rate_for(closes, idx, primary_key, h).to_dict()
+
     # ---- directional edge
     sign = 1.0 if side == "BUY" else -1.0
     edge = edge_lo = None
@@ -277,6 +291,7 @@ def evaluate(symbol: str, side: str, notional_usd: float, klines: List[list],
         horizon_days=policy.horizon_days, signal_bar_date=signal_date,
         active_setups=active, thesis=thesis, claimed_setups=claimed, primary_setup=primary_key,
         primary=primary.to_dict() if primary else None,
+        primary_by_horizon=by_horizon,
         baseline=baseline.to_dict(),
         all_setups={k: r.to_dict() for k, r in rates.items()},
         cost=cost.to_dict(),

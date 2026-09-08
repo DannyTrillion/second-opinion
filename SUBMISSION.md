@@ -18,7 +18,9 @@ Real example, replayed on 27 Aug: SOL +6.9%, 20-day breakout, agent says momentu
 
 Agent OS both ways: an MCP server any client can call, and a Claude Code hook that fires on every binance-mcp-server order tool so the check cannot be skipped. Fail closed. Approved orders still hit Binance's confirm-before-execute.
 
-Measured, not predicted. 35 offline tests on committed real data, byte-identical decisions with a pinned hash, hash-chained audit log. No keys, no scopes, public data only.
+Across 20 Binance markets: three green days in a row has never paid after cost (lost in 8), three red days paid in 5 and lost in 0. Chasing strength is the setup to be most suspicious of, and it is the one AIs reach for by name.
+
+Measured, not predicted. 38 offline tests on committed real data, byte-identical decisions with a pinned hash, hash-chained audit log. No keys, no scopes, public data only.
 
 Code: https://github.com/DannyTrillion/second-opinion
 

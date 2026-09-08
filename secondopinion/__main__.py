@@ -65,6 +65,57 @@ def cmd_demo(a: argparse.Namespace) -> int:
     return 0
 
 
+def _wf_summary_to_files(results, out: Path) -> str:
+    from .engine.walkforward import summarize, render_markdown
+    summary = summarize(results)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "walkforward.json").write_text(json.dumps({"summary": summary, "results": results}, sort_keys=True))
+    note = "Fixtures: daily bars through %s." % results[0]["rows"][-1]["date"] if results and results[0]["rows"] else ""
+    md = render_markdown(summary, note)
+    (out / "EVALUATION.md").write_text(md)
+    return md
+
+
+def cmd_evaluate(a: argparse.Namespace) -> int:
+    """Walk-forward evaluation of the gate on the committed fixtures. Deterministic. Sequential, so run one
+    process per symbol with --out docs/wf and combine them with --merge docs/wf."""
+    import time as _t
+    from .config import fixtures_dir
+    from .engine.walkforward import walk_forward
+    out = Path(a.out)
+    if a.merge:
+        results = [json.loads(p.read_text()) for p in sorted(Path(a.merge).glob("*.json"))]
+        print(_wf_summary_to_files(results, out))
+        return 0
+    fx = fixtures_dir()
+    syms = a.symbols.split(",") if a.symbols else ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]
+    now = int(_t.time() * 1000)
+    results = []
+    for s in syms:
+        kl = [r for r in json.loads((fx / ("%s_1d.json" % s)).read_text()) if int(r[6]) <= now]
+        res = walk_forward(s, kl, a.horizon, 100.0, None, a.every, 30.0)
+        results.append(res)
+        if a.per_symbol:
+            out.mkdir(parents=True, exist_ok=True)
+            (out / ("%s.json" % s)).write_text(json.dumps(res, sort_keys=True))
+            print("%s: %d days judged" % (s, res["days"]))
+    if not a.per_symbol:
+        print(_wf_summary_to_files(results, out))
+    return 0
+
+
+def cmd_evidence(a: argparse.Namespace) -> int:
+    from .config import fixtures_dir
+    from .engine.evidence import build, render_markdown
+    ev = build(fixtures_dir(), a.horizon)
+    out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    (out / "evidence.json").write_text(json.dumps(ev, sort_keys=True))
+    md = render_markdown(ev)
+    (out / "EVIDENCE.md").write_text(md)
+    print(md)
+    return 0
+
+
 def cmd_serve(a: argparse.Namespace) -> int:
     from .mcp.server import serve
     serve()
@@ -137,6 +188,14 @@ def main(argv=None) -> int:
 
     d = sub.add_parser("demo", help="play the three reference scenarios")
     d.add_argument("--offline", action="store_true"); d.set_defaults(fn=cmd_demo)
+    ev = sub.add_parser("evaluate", help="walk-forward evaluation of the gate on committed fixtures")
+    ev.add_argument("--symbols", help="comma list, default BTC,ETH,SOL,BNB"); ev.add_argument("--horizon", type=int, default=3)
+    ev.add_argument("--every", type=int, default=1, help="judge every Nth day (1 = all)"); ev.add_argument("--out", default="docs")
+    ev.add_argument("--per-symbol", dest="per_symbol", action="store_true", help="write one JSON per symbol into --out instead of the summary")
+    ev.add_argument("--merge", help="directory of per-symbol JSON files to combine into the summary")
+    ev.set_defaults(fn=cmd_evaluate)
+    ed = sub.add_parser("evidence", help="cross-symbol base-rate tables from committed fixtures")
+    ed.add_argument("--horizon", type=int, default=3); ed.add_argument("--out", default="docs"); ed.set_defaults(fn=cmd_evidence)
     sub.add_parser("serve", help="run the MCP server on stdio").set_defaults(fn=cmd_serve)
     sub.add_parser("hook", help="Claude Code PreToolUse hook (reads stdin)").set_defaults(fn=cmd_hook)
 

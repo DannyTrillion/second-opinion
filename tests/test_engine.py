@@ -197,7 +197,40 @@ class TestVerdict(unittest.TestCase):
         self.assertEqual(setups_claimed("I like the logo"), [])
 
 
-GOLDEN_SOL = "35251d903f0e21cf20bf65e8e1c7b1e87658883758de12133ec46069cbdc3796"
+GOLDEN_SOL = "a573151108396a57c9a614968a1c408778f3025767536fd49aaaa325e7f90fc0"
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestNewModules(unittest.TestCase):
+    def test_multi_horizon_in_receipt(self):
+        v = evaluate("SOLUSDT", "BUY", 100, load("SOLUSDT"), None, Policy(max_data_age_hours=1e9),
+                     now_ms=end_of("2026-08-27"), thesis="momentum")
+        self.assertEqual(sorted(v.primary_by_horizon.keys(), key=int), ["1", "3", "7"])
+        self.assertEqual(v.primary_by_horizon["3"]["n"], v.primary["n"])
+        self.assertIn("same setup by horizon", v.summary())
+
+    def test_walkforward_is_out_of_sample_and_summarises(self):
+        from secondopinion.engine.walkforward import walk_forward, summarize, render_markdown
+        kl = load("BNBUSDT")[:420]
+        res = walk_forward("BNBUSDT", kl, horizon=3, start=400, every=1)
+        self.assertEqual(res["days"], 420 - 3 - 400)
+        for r in res["rows"]:
+            self.assertIn(r["verdict"], ("APPROVE", "CAUTION", "VETO"))
+            c0, c1 = float(kl[r["t"]][4]), float(kl[r["t"] + 3][4])
+            self.assertAlmostEqual(r["gross"], c1 / c0 - 1.0)
+        s = summarize([res])
+        self.assertEqual(s["days_total"], res["days"])
+        md = render_markdown(s)
+        self.assertIn("walk-forward", md)
+
+    def test_evidence_tables(self):
+        from secondopinion.engine.evidence import build, render_markdown
+        ev = build(FX, 3)
+        self.assertGreaterEqual(len(ev["symbols"]), 4)
+        self.assertIn("BTCUSDT", ev["table"])
+        for p in ev["pairs"]:
+            self.assertGreaterEqual(p["n"], ev["min_n"])
+            self.assertFalse(p["pays"] and p["loses"])
+        self.assertIn("| setup |", render_markdown(ev))

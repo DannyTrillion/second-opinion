@@ -57,6 +57,30 @@ edge after cost +65.7 bps (CI low -14.8 bps)
 
 Honest output: the median edge is positive, but the lower bound of the interval is not, so Second Opinion asks rather than approves.
 
+## What the data says, across 20 Binance markets
+
+Running the same base rates over 20 USDT pairs (up to 1,000 daily bars each, through today) gives [docs/EVIDENCE.md](docs/EVIDENCE.md). Two findings carry the whole project:
+
+| setup | markets where it paid after cost | markets where it reliably lost | markets tested |
+| --- | --- | --- | --- |
+| Three green days in a row (`THREE_UP`) | 0 | 8 | 20 |
+| 20-day breakout (`BREAKOUT_20D`) | 0 | 4 | 20 |
+| Big up day (`BIG_UP_DAY`) | 0 | 3 | 20 |
+| Three red days in a row (`THREE_DOWN`) | 5 | 0 | 20 |
+
+"Paid" means the lower 95% bound on the median 3-day return clears a 30 bps round trip; "lost" means the upper bound does not reach it. Chasing strength has not paid anywhere in this sample. Buying three red days has, on SOL, LINK, LTC, PEPE and TON. This is exactly the pattern an AI's language runs against: "momentum" sounds like a reason, and the record says it is the one setup to be most suspicious of.
+
+Every receipt now shows the primary setup at 1, 3 and 7 days, so a 3-day coin flip cannot hide a 7-day edge or loss:
+
+```
+setup BIG_UP_DAY: n=80, median -1.51%, hit 40%, CI95 median [-3.17%, +0.15%]
+same setup by horizon (median/hit): 1d +0.21%/54%, 3d -1.51%/40%, 7d -1.23%/46%
+```
+
+## Does the gate itself work?
+
+See [docs/EVALUATION.md](docs/EVALUATION.md): a walk-forward test where Second Opinion judged a buy on every single day of eight symbols' history using only the data available that day, and the realized return was recorded afterwards. WALKFORWARD_SUMMARY
+
 ## How it plugs into Agent OS
 
 ```
@@ -102,7 +126,7 @@ python3 -m secondopinion rates BNBUSDT
 # round-trip cost for a size, from the live book
 python3 -m secondopinion cost BTCUSDT 250
 
-# play the three reference scenarios, then run the tests (35, offline)
+# play the three reference scenarios, then run the tests (38, offline)
 python3 -m secondopinion demo --offline
 python3 -m unittest discover -s tests -v
 ```
@@ -129,6 +153,10 @@ python3 -m secondopinion install-hook --apply    # merges it into ~/.claude/sett
 Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first.
 
 Set `SECOND_OPINION_MODE=advisory` to make the hook never deny, only ask with the receipt attached.
+
+### As a skill
+
+[skills/second-opinion/SKILL.md](skills/second-opinion/SKILL.md) packages the same workflow as an agent skill in the Binance Skills Hub format: when to call `second_opinion`, how to read `thesis_present` first, and how to act on each verdict. Drop it into any client that loads skills, or point Claude Code at it with `claude skills add`.
 
 ## The setups
 
@@ -168,7 +196,7 @@ Every decision, whether from the CLI, the MCP server, or the hook, is appended t
 ## What it does not do, on purpose
 
 - It does not predict. A base rate is what happened, not what will happen. A 62% hit rate on 109 occurrences is a tilt, not a promise, and the output says so.
-- Daily bars only, 1,000 of them. Intraday setups are out of scope; the MCP server's candle tool can be swapped in later.
+- Daily bars only, up to 1,000 of them. Intraday setups are out of scope; the MCP server's candle tool can be swapped in later.
 - Spot pricing only. Futures funding is not modelled; a perp position's carry is a separate question.
 - The hook classifies Binance MCP tools by name. Binance has not published the tool schema, so unknown names ask rather than allow. Once you have the real names from `tools/list`, tighten the matcher.
 - No live trade is in this repository. The demo shows the veto and approve paths on live data and the hook firing inside Claude Code; the account was not funded during the hackathon window.
@@ -182,14 +210,18 @@ secondopinion/
   engine/setups.py     setup taxonomy, no-lookahead thresholds
   engine/baserate.py   forward returns, bootstrap CI, fixed seed
   engine/cost.py       fees + order-book walk
-  engine/verdict.py    checks, verdict, body hash
+  engine/verdict.py    checks, verdict, multi-horizon, body hash
+  engine/evidence.py   cross-symbol base-rate tables
+  engine/walkforward.py day-by-day out-of-sample test of the gate
   service.py           the one entry point the CLI, server and hook all use
   mcp/server.py        stdio JSON-RPC MCP server, 5 tools
   hook/pretooluse.py   Claude Code PreToolUse hook, fail closed
   audit.py             hash-chained JSONL log
   __main__.py          CLI
-fixtures/              1,000 real daily bars each for BTC, ETH, SOL, BNB; a depth snapshot; exchange filters
-tests/                 35 tests, all offline
+fixtures/              up to 1,000 real daily bars for 20 USDT pairs; a depth snapshot; exchange filters
+docs/                  EVIDENCE.md (what paid where), EVALUATION.md (walk-forward test of the gate)
+skills/                Skills Hub packaging
+tests/                 38 tests, all offline
 hooks/                 Claude Code settings example
 ```
 

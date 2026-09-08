@@ -75,6 +75,17 @@ def summarize(results: List[Dict[str, Any]]) -> Dict[str, Any]:
         "by_setup_and_verdict": {},
         "per_symbol": per_symbol,
     }
+    strength = ("BIG_UP_DAY", "THREE_UP", "BREAKOUT_20D", "RSI_OVERBOUGHT")
+    weakness = ("BIG_DOWN_DAY", "THREE_DOWN", "BREAKDOWN_20D", "RSI_OVERSOLD")
+    spec = [r for r in pooled if r["specific"]]
+    out["gate_effect"] = {
+        "specific_days_all": _stats(spec),
+        "specific_days_not_vetoed": _stats([r for r in spec if r["verdict"] != "VETO"]),
+        "vetoes_on_strength_setups": _stats([r for r in spec if r["verdict"] == "VETO" and r["primary"] in strength]),
+        "vetoes_on_weakness_setups": _stats([r for r in spec if r["verdict"] == "VETO" and r["primary"] in weakness]),
+        "all_strength_days": _stats([r for r in spec if r["primary"] in strength]),
+        "all_weakness_days": _stats([r for r in spec if r["primary"] in weakness]),
+    }
     setups = sorted({r["primary"] for r in pooled if r["primary"]})
     for s in setups:
         out["by_setup_and_verdict"][s] = {v: _stats([r for r in pooled if r["primary"] == s and r["verdict"] == v]) for v in ("APPROVE", "CAUTION", "VETO")}
@@ -117,6 +128,17 @@ def render_markdown(summary: Dict[str, Any], generated_note: str = "") -> str:
     L.append(hdr)
     for v in ("APPROVE", "CAUTION", "VETO"):
         L.append(row(v, summary["specific_by_verdict"][v]))
+    L.append("")
+    L.append("## What the gate changed")
+    L.append("")
+    L.append("Strength setups: BIG_UP_DAY, THREE_UP, BREAKOUT_20D, RSI_OVERBOUGHT. Weakness setups: BIG_DOWN_DAY, THREE_DOWN, BREAKDOWN_20D, RSI_OVERSOLD.")
+    L.append("")
+    L.append(hdr.replace("verdict", "slice"))
+    ge = summary["gate_effect"]
+    for label, key in (("every specific-setup day, no gate", "specific_days_all"), ("specific-setup days the gate did not veto", "specific_days_not_vetoed"),
+                       ("vetoes on strength setups (chasing)", "vetoes_on_strength_setups"), ("vetoes on weakness setups (dip buys)", "vetoes_on_weakness_setups"),
+                       ("all strength days", "all_strength_days"), ("all weakness days", "all_weakness_days")):
+        L.append(row(label, ge[key]))
     L.append("")
     L.append("## By primary setup and verdict")
     L.append("")

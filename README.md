@@ -79,7 +79,21 @@ same setup by horizon (median/hit): 1d +0.21%/54%, 3d -1.51%/40%, 7d -1.23%/46%
 
 ## Does the gate itself work?
 
-See [docs/EVALUATION.md](docs/EVALUATION.md): a walk-forward test where Second Opinion judged a buy on every single day of eight symbols' history using only the data available that day, and the realized return was recorded afterwards. WALKFORWARD_SUMMARY
+[docs/EVALUATION.md](docs/EVALUATION.md) is a walk-forward test: Second Opinion judged a $100 buy on every one of 5,568 days across eight symbols, using only the bars available on each day, and the realized 3-day return was recorded afterwards. No thresholds were tuned on this result. Here is what it found, including the parts that do not flatter the tool.
+
+| days with a specific setup on the chart | days | median 3d | hit rate | mean net of 30 bps |
+| --- | --- | --- | --- | --- |
+| every such day, no gate | 2,440 | +0.08% | 51% | +0.05% |
+| the days the gate did not veto | 1,480 | +0.34% | 53% | +0.13% |
+| vetoes on strength setups (momentum, breakout, overbought) | 742 | -0.64% | 45% | -0.20% |
+| vetoes on weakness setups (dips, oversold) | 218 | +0.51% | 55% | +0.37% |
+| approvals | 109 | -0.04% | 50% | -0.62% |
+
+**What works.** The gate's core job is stopping an AI from chasing strength, and out of sample that is where it is right: the 742 strength-chasing trades it vetoed lost a median 0.64% and paid 45% of the time. The 559 vetoes on big up days and three green days alone lost a median 1.13%. Filtering only by the gate's vetoes raised the median outcome of setup days from +0.08% to +0.34%.
+
+**What does not.** `APPROVE` is not a buy signal. Only 109 of 5,568 days cleared the confidence bar, and they did no better than average, because a lower-CI-above-cost test on small samples selects flukes. Read `APPROVE` as "no objection found." And the gate is wrong when it vetoes dip buys: those 218 days went on to pay. The base-rate evidence that dips pay is stronger than the gate's per-day confidence test admits.
+
+Both findings are left in the code and the tables rather than tuned away, because a gate that was fitted to its own evaluation would be worth nothing.
 
 ## How it plugs into Agent OS
 

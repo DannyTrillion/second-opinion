@@ -80,6 +80,11 @@ class BinancePublicData:
                         return json.loads(resp.read().decode("utf-8"))
                 except urllib.error.URLError as e:
                     last_err = e
+                    if hasattr(e, "close"):
+                        try:
+                            e.close()  # HTTPError carries an open response body
+                        except Exception:
+                            pass
                     if "CERTIFICATE_VERIFY_FAILED" in str(e):
                         continue  # try the next CA bundle, never disable verification
                     break  # network/DNS problem: try next host

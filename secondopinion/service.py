@@ -87,7 +87,7 @@ def base_rates(symbol: str, horizon_days: int = 3, as_of: Optional[str] = None, 
     last = len(closes) - 1
     return {
         "symbol": sym, "horizon_days": horizon_days, "bars": len(closes),
-        "signal_bar_date": datetime.datetime.utcfromtimestamp(int(klines[-1][0]) / 1000).strftime("%Y-%m-%d"),
+        "signal_bar_date": datetime.datetime.fromtimestamp(int(klines[-1][0]) / 1000, tz=datetime.timezone.utc).strftime("%Y-%m-%d"),
         "active_setups": m.active_at(last),
         "snapshot": m.snapshot(last),
         "rates": {k: r.to_dict() for k, r in rates.items()},

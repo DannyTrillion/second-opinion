@@ -209,7 +209,16 @@ def main(argv=None) -> int:
     ih.set_defaults(fn=cmd_install_hook)
 
     a = p.parse_args(argv)
-    return a.fn(a)
+    try:
+        return a.fn(a)
+    except (ValueError, KeyError) as e:
+        print("error: %s" % e, file=sys.stderr)
+        return 3
+    except Exception as e:  # DataError and friends: one line, not a traceback
+        if type(e).__name__ == "DataError":
+            print("error: %s" % e, file=sys.stderr)
+            return 3
+        raise
 
 
 if __name__ == "__main__":

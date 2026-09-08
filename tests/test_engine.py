@@ -197,7 +197,7 @@ class TestVerdict(unittest.TestCase):
         self.assertEqual(setups_claimed("I like the logo"), [])
 
 
-GOLDEN_SOL = "a573151108396a57c9a614968a1c408778f3025767536fd49aaaa325e7f90fc0"
+GOLDEN_SOL = "5ed4e0e51840128b2eeb01bfb240a63a943aa43ea2fa4b7839a61876c59b8d5a"
 
 if __name__ == "__main__":
     unittest.main()

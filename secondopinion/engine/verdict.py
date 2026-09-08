@@ -141,7 +141,7 @@ class Verdict:
 
 def _bar_date(ms: int) -> str:
     import datetime
-    return datetime.datetime.utcfromtimestamp(ms / 1000).strftime("%Y-%m-%d")
+    return datetime.datetime.fromtimestamp(ms / 1000, tz=datetime.timezone.utc).strftime("%Y-%m-%d")
 
 
 def _canon(d: Dict[str, Any]) -> str:
@@ -172,7 +172,7 @@ def evaluate(symbol: str, side: str, notional_usd: float, klines: List[list],
     now_ms = now_ms if now_ms is not None else int(time.time() * 1000)
     completed = [r for r in klines if int(r[6]) <= now_ms]
     if len(completed) < 80:
-        raise ValueError("need at least 80 completed daily bars, got %d" % len(completed))
+        raise ValueError("need at least 80 completed daily bars for %s, got %d" % (symbol, len(completed)))
     closes = [float(r[4]) for r in completed]
     signal_i = len(closes) - 1
     signal_date = _bar_date(int(completed[-1][0]))
@@ -190,6 +190,7 @@ def evaluate(symbol: str, side: str, notional_usd: float, klines: List[list],
             if f.get("filterType") == "NOTIONAL" and f.get("minNotional"):
                 mn = float(f["minNotional"])
                 checks.append(Check("min_notional", notional_usd >= mn, notional_usd, mn, "USD"))
+    checks.append(Check("positive_notional", notional_usd > 0, notional_usd, "> 0", "USD"))
     checks.append(Check("max_notional", notional_usd <= policy.max_notional_usd, notional_usd, policy.max_notional_usd, "USD"))
 
     # ---- cost
@@ -258,7 +259,7 @@ def evaluate(symbol: str, side: str, notional_usd: float, klines: List[list],
         checks.append(Check("hit_rate", hit >= 0.5, round(hit, 4), 0.5, "share of past occurrences that paid"))
 
     # ---- decide
-    hard = [c for c in checks if c.name in ("data_freshness", "symbol_allowlist", "symbol_trading", "min_notional", "max_notional", "round_trip_cost", "book_absorbs_size", "thesis_present")]
+    hard = [c for c in checks if c.name in ("data_freshness", "symbol_allowlist", "symbol_trading", "min_notional", "positive_notional", "max_notional", "round_trip_cost", "book_absorbs_size", "thesis_present")]
     soft = [c for c in checks if c.name in ("edge_after_cost", "hit_rate")]
     ci = [c for c in checks if c.name == "edge_ci_low"]
     ev = [c for c in checks if c.name == "evidence"]

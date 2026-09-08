@@ -36,7 +36,7 @@ body sha256 04d82487640e7575
 
 The chart really did show a big up day and a breakout. The problem is what followed the previous 80 of them: SOL lost a median 1.5% over the next three days and paid only 40% of the time. (What actually followed: SOL closed at $109.14 on 27 August and $101.75 three days later, -6.8%.)
 
-A thesis that is not on the chart at all:
+A thesis that is not on the chart at all (live run on 8 September 2026):
 
 ```
 $ python3 -m secondopinion check ETH buy 50 --thesis "momentum breakout"
@@ -145,7 +145,7 @@ python3 -m secondopinion demo --offline
 python3 -m unittest discover -s tests -v
 ```
 
-Exit codes: `0` approve, `1` caution, `2` veto, so it drops straight into a shell pipeline or cron.
+Exit codes: `0` approve, `1` caution, `2` veto, `3` error, so it drops straight into a shell pipeline or cron.
 
 ### Register the MCP server
 

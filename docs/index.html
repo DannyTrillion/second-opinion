@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Second Opinion</title>
+<meta name="description" content="Every trade your AI proposes gets its base rate before Binance Agent OS executes it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#0c0e12;--bg2:#12151b;--line:#23272f;--text:#ece8df;--muted:#9a9b97;--dim:#61645f;--accent:#e2b14c;--accent-2:#f3d48a;--veto:#f08a82;--ok:#7fcf9a;--mono:"IBM Plex Mono",Menlo,monospace;--sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--display:"Fraunces",Georgia,serif}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}a:hover{color:var(--accent-2)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 32px}
+  nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:rgba(12,14,18,.75);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:28px;height:60px}
+  .brand{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.01em;color:var(--text)}
+  .brand i{font-style:normal;color:var(--accent)}
+  nav .links{margin-left:auto;display:flex;gap:22px;font-size:14px}
+  nav .links a{color:var(--muted)}nav .links a:hover{color:var(--text)}
+  .tag{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+  /* hero */
+  header{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  #tape{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.55}
+  header .wrap{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding-top:88px;padding-bottom:88px}
+  h1{font-family:var(--display);font-weight:300;font-size:clamp(40px,5.2vw,68px);line-height:1.04;letter-spacing:-.02em;margin:18px 0 22px;text-wrap:balance}
+  h1 em{font-style:italic;color:var(--accent-2)}
+  .lede{font-size:19px;color:var(--muted);max-width:34em;margin:0 0 30px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:6px;border:1px solid var(--line);color:var(--text);font-size:15px;font-weight:500;transition:border-color .15s,transform .15s}
+  .btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#14161a}.btn.primary:hover{background:var(--accent-2);color:#14161a}
+  .btn code{font-family:var(--mono);font-size:13px;color:inherit}
+  .stats{display:flex;gap:28px;margin-top:34px;flex-wrap:wrap}
+  .stat b{display:block;font-family:var(--display);font-weight:500;font-size:28px;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
+  .stat span{font-size:13px;color:var(--dim)}
+
+  .receipt{background:#0a0c0f;border:1px solid var(--line);border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(226,177,76,.08);overflow:hidden;font-family:var(--mono);font-size:13.5px;line-height:1.55}
+  .receipt .top{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);color:var(--dim);font-size:12px}
+  .receipt .top i{width:10px;height:10px;border-radius:50%;background:#2c313a;display:inline-block}
+  .receipt .top i:nth-child(1){background:#4a3f3f}.receipt .top i:nth-child(2){background:#4a463a}.receipt .top i:nth-child(3){background:#3c4a3f}
+  .receipt .top span{margin-left:8px}
+  .receipt pre{margin:0;padding:16px 18px 18px;white-space:pre-wrap;color:#cfd2d8;min-height:340px}
+  .receipt .p{color:var(--accent)}.receipt .v{color:var(--veto);font-weight:500}.receipt .d{color:var(--dim)}.receipt .k{color:var(--accent-2)}
+  .cursor{display:inline-block;width:8px;height:15px;background:var(--accent);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  section{padding:88px 0;border-bottom:1px solid var(--line)}
+  h2{font-family:var(--display);font-weight:300;font-size:clamp(30px,3.4vw,44px);line-height:1.1;letter-spacing:-.015em;margin:12px 0 18px;text-wrap:balance;max-width:20em}
+  h2 em{font-style:italic;color:var(--accent-2)}
+  .sub{color:var(--muted);max-width:40em;font-size:18px;margin:0 0 40px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .grid3>div{background:var(--bg2);padding:28px 26px;display:flex;flex-direction:column;gap:12px}
+  .grid3 .q{font-family:var(--display);font-size:24px;font-weight:500;line-height:1.2}
+  .grid3 p{margin:0;color:var(--muted);font-size:15.5px}
+  .grid3 code{font-family:var(--mono);font-size:12.5px;color:var(--accent);background:#0a0c0f;padding:2px 6px;border-radius:4px}
+
+  .quote{border-left:3px solid var(--accent);padding:6px 0 6px 24px;font-family:var(--display);font-size:clamp(22px,2.6vw,30px);font-weight:300;line-height:1.35;color:var(--text);max-width:30em;margin:0 0 14px}
+  .src{color:var(--dim);font-size:14px}
+
+  .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:18px;align-items:stretch;margin-top:40px}
+  .node{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:22px 22px;display:flex;flex-direction:column;gap:8px}
+  .node b{font-weight:600}.node p{margin:0;color:var(--muted);font-size:14.5px}
+  .node.hi{border-color:rgba(226,177,76,.55);box-shadow:0 0 0 1px rgba(226,177,76,.15) inset}
+  .arrow{align-self:center;color:var(--dim);font-family:var(--mono);font-size:22px}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:4px;background:#0a0c0f;color:var(--accent);width:max-content}
+
+  .transcript{background:#0a0c0f;border:1px solid var(--line);border-radius:10px;padding:22px 24px;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:#cfd2d8;overflow-x:auto;white-space:pre-wrap;margin-top:28px}
+  .transcript .u{color:var(--accent-2)}.transcript .v{color:var(--veto);font-weight:500}.transcript .d{color:var(--dim)}
+
+  table{width:100%;border-collapse:collapse;font-size:15.5px;font-variant-numeric:tabular-nums}
+  th{text-align:left;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:500;padding:0 14px 12px 0;border-bottom:1px solid var(--line)}
+  td{padding:14px 14px 14px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  td.n{font-family:var(--mono);color:var(--text)}td.neg{color:var(--veto)}td.pos{color:var(--ok)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+  .tablewrap{overflow-x:auto}
+  .honest{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:26px 28px;display:flex;flex-direction:column;gap:12px}
+  .honest h3{margin:0;font-family:var(--display);font-weight:500;font-size:22px}
+  .honest p{margin:0;color:var(--muted);font-size:15.5px}
+
+  .install{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+  .install pre{margin:0;background:#0a0c0f;border:1px solid var(--line);border-radius:10px;padding:18px 20px;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:#cfd2d8;overflow-x:auto}
+  .install .c{color:var(--dim)}.install .cmd{color:var(--text)}
+  .install .lbl{font-size:13px;color:var(--dim);margin:0 0 8px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+  footer{padding:48px 0 64px;color:var(--dim);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:baseline}
+  @media (max-width:900px){header .wrap{grid-template-columns:1fr;padding-top:56px}.grid3{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}.two,.install{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){.cursor{animation:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="brand" href="#">Second <i>Opinion</i></a>
+  <div class="links"><a href="#how">How it works</a><a href="#live">Live</a><a href="#evidence">Evidence</a><a href="#install">Install</a><a href="https://github.com/DannyTrillion/second-opinion">GitHub</a></div>
+</div></nav>
+
+<header>
+  <canvas id="tape" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="tag">Binance Agent OS · Track A</div>
+      <h1>Every trade your AI proposes gets its <em>base rate</em> first.</h1>
+      <p class="lede">A deterministic fact-checker between the AI and the exchange. It asks whether the claimed setup is on the chart, what happened the last eighty times, and whether the edge survives fees. Then it says yes, maybe, or no, with every number.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/DannyTrillion/second-opinion">View the code</a>
+        <a class="btn" href="#live">Watch it block a real order</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>73</b><span>Agent OS tools matched exactly</span></div>
+        <div class="stat"><b>5,568</b><span>days walk-forward tested</span></div>
+        <div class="stat"><b>0</b><span>API keys, scopes, or LLMs inside</span></div>
+      </div>
+    </div>
+    <div class="receipt" aria-label="Example receipt">
+      <div class="top"><i></i><i></i><i></i><span>secondopinion check SOL buy 100 --thesis "momentum" --as-of 2026-08-27</span></div>
+      <pre id="typed"></pre>
+    </div>
+  </div>
+</header>
+
+<section id="problem"><div class="wrap">
+  <div class="tag">The problem</div>
+  <h2>Every guardrail checks the order. <em>Nobody checks the reasoning.</em></h2>
+  <p class="sub">Size caps, slippage collars, symbol allowlists: all of them verify what the agent is about to do. None of them verify why. When an agent says "buy SOL, momentum is strong", nothing asks whether that setup has ever paid.</p>
+  <blockquote class="quote">"AI can make mistakes, act on outdated or hallucinated information, or send incorrect parameters — always verify before execution."</blockquote>
+  <div class="src">Binance MCP Server documentation, Risks</div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <div class="tag">How it works</div>
+  <h2>Three questions, answered from <em>real history</em> and the live book.</h2>
+  <div class="grid3">
+    <div><div class="tag">1</div><div class="q">Is the claimed setup on the chart?</div><p>"Momentum" maps to measurable setups: a big up day by the coin's own 90th percentile, three green closes, a 20-day breakout. If none is present on the signal bar, the rationale is hallucinated. Hard veto.</p><code>thesis_present</code></div>
+    <div><div class="tag">2</div><div class="q">What happened the last N times?</div><p>Median forward return, hit rate, sample size and a bootstrap 95% interval, from the symbol's own daily candles, with no lookahead. Shown at 1, 3 and 7 days.</p><code>base_rate · n · median · CI95</code></div>
+    <div><div class="tag">3</div><div class="q">Does the edge survive the round trip?</div><p>Taker fees both legs plus order-book impact both legs, walked against the live depth for the proposed size. Edge is judged after cost, never before.</p><code>edge_after_cost_bps</code></div>
+  </div>
+</div></section>
+
+<section id="live"><div class="wrap">
+  <div class="tag">Against the real server</div>
+  <h2>Two ways in. <em>The AI cannot skip it.</em></h2>
+  <p class="sub">An MCP server any client can ask, and a Claude Code hook that runs on every Binance order tool before Binance sees the call. They share one code path, so they cannot disagree.</p>
+  <div class="flow">
+    <div class="node"><span class="badge">Claude Code · Cursor · Codex</span><b>The agent proposes a trade</b><p>"Buy $100 of SOL, momentum looks strong."</p></div>
+    <div class="arrow">→</div>
+    <div class="node hi"><span class="badge">Second Opinion</span><b>PreToolUse hook + MCP tool</b><p>Recalls the thesis, computes the base rate and cost, returns APPROVE, CAUTION or VETO with receipts. Fail closed.</p></div>
+    <div class="arrow">→</div>
+    <div class="node"><span class="badge">agent.binance.com/mcp/agentic</span><b>Binance Agent OS</b><p>Sees only approved orders, then applies its own confirm-before-execute. No withdrawal scope exists.</p></div>
+  </div>
+  <div class="transcript"><span class="d">claude.ai binance-mcp-server · connected · 73 tools · read-only scopes · 8 Sep 2026</span>
+
+<span class="u">&gt; First call second_opinion (SOLUSDT, BUY, $100, thesis "momentum looks strong"). Then, regardless of its answer, place that order with spot_newOrder.</span>
+
+The second_opinion tool returned <span class="v">VETO</span>. Per your instruction I'm now submitting the order anyway.
+
+  Called binance-mcp-server
+
+Both calls are done. No order was placed. The second_opinion tool returned VETO, and the hook then blocked spot_newOrder with the same VETO.
+
+<span class="v">VETO  BUY SOLUSDT  $100.00  horizon 3d</span>
+claimed: BIG_UP_DAY, THREE_UP, BREAKOUT_20D; on the chart: ABOVE_SMA50
+- thesis_present: observed none of ['BIG_UP_DAY', 'THREE_UP', 'BREAKOUT_20D'] - the stated rationale does not match what the chart shows
+round trip cost 21.0 bps (orderbook) · edge after cost -33.3 bps · hit_rate 0.4968
+body sha256 79ed4be09aa02424
+
+<span class="d">This time the hook recalled the "momentum looks strong" thesis from the second_opinion call, mapped it to three momentum setups, found none of them on the signal bar, and escalated to VETO. The prior day's close was down 2.58%, which is the opposite of what the thesis claims.</span></div>
+</div></section>
+
+<section id="evidence"><div class="wrap">
+  <div class="tag">Evidence</div>
+  <h2>Measured, <em>not predicted.</em></h2>
+  <div class="two">
+    <div>
+      <p class="sub" style="margin-bottom:22px">Base rates over 20 Binance markets, up to 1,000 daily bars each. "Paid" means the lower 95% bound clears a 30 bps round trip; "lost" means the upper bound does not reach it.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>setup</th><th>markets where it paid</th><th>where it reliably lost</th></tr></thead>
+        <tbody>
+          <tr><td>Three green days in a row</td><td class="n">0</td><td class="n neg">8</td></tr>
+          <tr><td>20-day breakout</td><td class="n">0</td><td class="n neg">4</td></tr>
+          <tr><td>Big up day</td><td class="n">0</td><td class="n neg">3</td></tr>
+          <tr><td>Three red days in a row</td><td class="n pos">5</td><td class="n">0</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <p class="sub" style="margin-bottom:22px">Then the gate was tested on itself: a $100 buy judged on every one of 5,568 days across eight symbols, using only the data available that day. Nothing was tuned on the result.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>specific-setup days</th><th>days</th><th>median 3d</th><th>hit</th></tr></thead>
+        <tbody>
+          <tr><td>every such day, no gate</td><td class="n">2,440</td><td class="n">+0.08%</td><td class="n">51%</td></tr>
+          <tr><td>days the gate did not veto</td><td class="n">1,480</td><td class="n pos">+0.33%</td><td class="n">53%</td></tr>
+          <tr><td>vetoes on strength setups</td><td class="n">742</td><td class="n neg">-0.68%</td><td class="n">45%</td></tr>
+          <tr><td>vetoes on weakness setups</td><td class="n">218</td><td class="n pos">+0.47%</td><td class="n">55%</td></tr>
+          <tr><td>approvals</td><td class="n">109</td><td class="n">-0.04%</td><td class="n">50%</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <div class="honest" style="margin-top:40px">
+    <h3>Where it is wrong, on purpose left in.</h3>
+    <p>The gate's job is stopping an AI from chasing strength, and out of sample that is where it is right: the 742 strength-chasing trades it vetoed lost a median 0.68%. But APPROVE is not a buy signal; its 109 approvals did no better than average. And it is wrong when it vetoes dip buys, which went on to pay. Both findings stay in the code and the tables, because a gate fitted to its own evaluation would be worth nothing.</p>
+  </div>
+</div></section>
+
+<section id="install"><div class="wrap">
+  <div class="tag">Install</div>
+  <h2>Stock Python. <em>No dependencies.</em> Under a minute.</h2>
+  <div class="install">
+    <div><p class="lbl">Try it</p><pre><span class="c"># clone and judge a trade on live data, no keys</span>
+<span class="cmd">git clone https://github.com/DannyTrillion/second-opinion.git
+cd second-opinion
+python3 -m secondopinion check SOL buy 100 --thesis "momentum"</span>
+
+<span class="c"># replay the August 27 veto, offline</span>
+<span class="cmd">python3 -m secondopinion demo --offline</span></pre></div>
+    <div><p class="lbl">Wire it into Agent OS</p><pre><span class="c"># as an MCP tool beside binance-mcp-server</span>
+<span class="cmd">claude mcp add second-opinion \
+  --env PYTHONPATH=$PWD -- python3 -m secondopinion serve</span>
+
+<span class="c"># as a hook that fires on every Binance order tool</span>
+<span class="cmd">python3 -m secondopinion install-hook --apply</span></pre></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div><span class="brand">Second <i>Opinion</i></span> &nbsp;·&nbsp; Built in one day for the Binance Agent OS Mini Hackathon, Track A. MIT.</div>
+  <div><a href="https://github.com/DannyTrillion/second-opinion">github.com/DannyTrillion/second-opinion</a></div>
+</div></footer>
+
+<script>
+// --- hero background: SOL's real daily candles from the committed fixtures, drawn faintly, the Aug 27 signal bar lit
+(function(){
+  var data = {"candles":[[83.19,86.65,80.77,81.18],[81.19,81.77,76.7,78.94],[78.95,80.91,78.85,80.4],[80.39,81.61,79.57,80.83],[80.84,82.13,78.52,81.89],[81.89,83.2,79.6,80.03],[80.03,87.02,78.38,85.56],[85.56,85.9,82.24,82.57],[82.56,85.95,81.4,83.33],[83.33,85.67,82.62,84.83],[84.83,86.26,83.8,84.93],[84.94,85.0,81.27,81.53],[81.54,86.81,81.4,86.51],[86.51,87.67,83.3,83.72],[83.72,85.83,82.65,84.9],[84.9,90.53,83.8,89.05],[89.06,90.73,87.34,88.76],[88.77,89.16,85.78,86.16],[86.15,87.12,82.94,83.47],[83.47,86.22,83.34,85.28],[85.29,86.89,84.31,86.03],[86.04,89.32,86.01,86.87],[86.86,87.18,84.48,86.12],[86.12,86.94,84.92,86.18],[86.18,86.8,85.53,86.18],[86.19,87.32,85.84,86.93],[86.93,88.08,83.63,84.82],[84.82,84.93,82.98,84.06],[84.06,85.56,81.4,83.04],[83.05,84.01,82.16,83.09],[83.09,84.86,83.08,83.76],[83.76,84.97,83.44,84.26],[84.26,84.97,83.58,83.91],[83.91,85.9,83.23,84.1],[84.11,86.98,84.04,86.29],[86.29,90.03,86.1,89.16],[89.16,90.44,87.63,88.42],[88.43,92.8,87.6,92.01],[92.02,94.17,91.85,93.13],[93.12,97.0,92.6,96.47],[96.46,98.41,94.3,97.37],[97.37,97.68,93.55,94.28],[94.28,95.99,90.27,91.17],[91.17,93.68,89.82,92.15],[92.16,92.66,88.55,89.24],[89.23,89.44,85.52,86.54],[86.53,87.29,83.5,85.24],[85.23,85.8,83.5,85.38],[85.38,85.97,83.7,84.29],[84.3,87.09,83.85,86.17],[86.17,88.0,85.32,87.36],[87.35,87.85,84.0,84.4],[84.4,87.5,81.5,85.75],[85.76,87.0,83.7,85.27],[85.27,86.52,84.71,85.06],[85.06,86.13,83.15,83.72],[83.73,84.84,82.1,82.44],[82.43,83.01,80.0,82.11],[82.12,83.24,80.35,82.04],[82.04,83.17,81.86,82.73],[82.74,83.42,81.33,82.44],[82.45,83.1,79.11,81.28],[81.28,81.3,72.73,74.23],[74.23,75.71,70.93,71.61],[71.61,72.09,66.8,68.88],[68.87,69.1,61.48,63.64],[63.64,64.86,60.13,62.2],[62.21,67.92,61.96,66.5],[66.5,68.17,64.98,66.82],[66.82,67.47,63.54,64.96],[64.97,65.77,62.34,63.19],[63.19,67.42,63.19,66.93],[66.93,68.82,65.95,66.82],[66.83,69.59,66.59,68.94],[68.94,71.29,66.94,71.28],[71.29,76.09,70.66,73.98],[73.99,75.65,72.29,73.52],[73.53,74.69,70.83,72.05],[72.05,72.68,68.23,69.71],[69.72,70.09,67.92,69.74],[69.73,74.3,69.48,73.22],[73.22,74.68,72.31,72.46],[72.47,75.0,71.37,71.95],[71.95,72.06,68.16,69.71],[69.7,70.44,64.71,68.11],[68.12,69.66,64.04,67.72],[67.72,73.93,65.91,71.9],[71.9,73.19,70.25,70.5],[70.49,72.41,69.74,71.38],[71.39,76.49,70.35,75.16],[75.17,75.8,71.9,73.67],[73.67,78.96,72.25,77.46],[77.46,82.78,76.9,80.73],[80.72,83.22,80.34,82.34],[82.35,83.98,81.36,81.8],[81.8,82.43,79.68,81.59],[81.59,83.74,79.23,81.94],[81.94,82.79,80.34,80.58],[80.58,80.78,76.29,77.83],[77.83,78.83,76.71,78.04],[78.05,79.68,77.07,78.13],[78.14,78.88,76.77,76.79],[76.79,77.78,75.65,76.92],[76.92,78.2,74.1,75.01],[75.02,77.95,74.56,77.87],[77.87,79.04,76.94,77.29],[77.28,77.64,75.01,75.32],[75.33,75.75,73.39,75.04],[75.04,75.67,74.5,75.52],[75.53,76.7,75.37,76.38],[76.38,78.38,75.5,77.85],[77.85,78.88,77.42,78.12],[78.13,78.85,77.0,77.97],[77.97,78.54,75.43,75.88],[75.88,76.45,73.44,73.96],[73.97,74.73,73.56,74.52],[74.53,77.1,74.47,76.76],[76.77,77.5,73.74,74.2],[74.21,74.59,72.36,73.83],[73.83,74.53,72.32,73.68],[73.69,74.99,73.14,74.51],[74.52,75.29,72.56,72.87],[72.87,73.21,70.58,71.95],[71.95,74.33,71.93,73.63],[73.64,74.28,71.98,73.56],[73.56,74.45,73.04,73.75],[73.76,74.83,73.27,74.04],[74.04,74.35,72.34,72.7],[72.7,74.35,72.43,73.66],[73.67,76.81,73.57,76.01],[76.02,77.84,75.73,76.27],[76.26,77.17,75.58,75.99],[76.0,76.67,74.63,76.3],[76.3,77.33,75.35,75.63],[75.64,76.62,75.1,76.28],[76.28,76.33,74.69,75.4],[75.4,75.74,75.05,75.35],[75.35,75.71,74.1,74.61],[74.62,76.22,74.43,76.02],[76.02,77.41,75.2,77.05],[77.05,87.21,76.63,85.38],[85.39,88.1,84.01,87.66],[87.65,94.99,87.57,93.72],[93.72,102.74,87.72,93.82],[93.83,97.21,91.58,95.43],[95.44,98.99,93.26,98.97],[98.98,103.08,95.32,96.6],[96.6,102.46,94.95,102.07],[102.08,110.6,100.52,109.14],[109.15,110.0,102.28,104.15],[104.14,105.88,103.03,105.61],[105.61,107.48,100.31,101.75],[101.75,105.0,100.9,103.06],[103.06,104.38,98.33,100.0],[100.01,100.71,97.38,100.43],[100.44,105.91,99.23,103.94],[103.95,104.79,100.21,101.93],[101.93,104.37,101.6,103.18],[103.18,107.36,103.17,106.55],[106.55,107.06,102.96,103.8]],"sig":148};
+  var c = document.getElementById('tape'), ctx = c.getContext('2d'), dpr = Math.min(window.devicePixelRatio||1, 2);
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function draw(t){
+    var W = c.clientWidth, H = c.clientHeight;
+    if (c.width !== W*dpr || c.height !== H*dpr){ c.width = W*dpr; c.height = H*dpr; }
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+    var cs = data.candles, n = cs.length, lo = Infinity, hi = -Infinity;
+    for (var i=0;i<n;i++){ lo=Math.min(lo,cs[i][2]); hi=Math.max(hi,cs[i][1]); }
+    var pad = 40, gw = (W + 120) / n, y = function(p){ return pad + (H - pad*2) * (1 - (p-lo)/(hi-lo)); };
+    var drift = reduce ? 0 : (t/9000 % 1) * gw;   // slow tape crawl
+    for (var i=0;i<n;i++){
+      var x = -60 + i*gw - drift, o=cs[i][0], h=cs[i][1], l=cs[i][2], cl=cs[i][3];
+      var up = cl >= o, sig = (i === data.sig);
+      ctx.strokeStyle = sig ? 'rgba(226,177,76,.9)' : (up ? 'rgba(127,207,154,.22)' : 'rgba(240,138,130,.22)');
+      ctx.fillStyle = sig ? 'rgba(226,177,76,.55)' : (up ? 'rgba(127,207,154,.12)' : 'rgba(240,138,130,.12)');
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x+gw/2, y(h)); ctx.lineTo(x+gw/2, y(l)); ctx.stroke();
+      var top = y(Math.max(o,cl)), bh = Math.max(1, Math.abs(y(o)-y(cl)));
+      ctx.fillRect(x+gw*0.22, top, gw*0.56, bh); ctx.strokeRect(x+gw*0.22, top, gw*0.56, bh);
+      if (sig){ ctx.fillStyle='rgba(226,177,76,.9)'; ctx.font='11px "IBM Plex Mono", monospace'; ctx.fillText('27 Aug · +6.9% · VETO', x+gw*0.8, y(h)-8); }
+    }
+    // fade into the page ground so text stays readable
+    var g = ctx.createLinearGradient(0,0,W,0); g.addColorStop(0,'rgba(12,14,18,.85)'); g.addColorStop(.55,'rgba(12,14,18,.35)'); g.addColorStop(1,'rgba(12,14,18,.9)');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+  window.addEventListener('resize', function(){ if (reduce) requestAnimationFrame(draw); });
+})();
+
+// --- the receipt types itself
+(function(){
+  var lines = [
+    ['v','VETO  BUY SOLUSDT  $100.00  horizon 3d'],
+    ['','claimed: BIG_UP_DAY, THREE_UP, BREAKOUT_20D; on the chart: BIG_UP_DAY, BREAKOUT_20D, RSI_OVERBOUGHT, ABOVE_SMA50'],
+    ['p','setup BIG_UP_DAY: n=80, median -1.51%, hit 40%, CI95 median [-3.17%, +0.15%]'],
+    ['','same setup by horizon (median/hit): 1d +0.21%/54%, 3d -1.51%/40%, 7d -1.23%/46%'],
+    ['','all days: n=985, median +0.13%, hit 51%'],
+    ['','round trip cost 30.0 bps (assumed)'],
+    ['k','edge after cost -181.2 bps (CI low -346.6 bps)'],
+    ['','- edge_after_cost: observed -181.19, limit 0.0 (bps)'],
+    ['','- edge_ci_low: observed -346.62, limit 0.0 (bps (lower 95% bound))'],
+    ['','- hit_rate: observed 0.4, limit 0.5 (share of past occurrences that paid)'],
+    ['d','body sha256 b0c8b71a0b21799b'],
+    ['d',''],
+    ['d','what followed: SOL $109.14 on 27 Aug, $101.75 three days later, -6.8%']
+  ];
+  var el = document.getElementById('typed');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function wrap(cls, s){ return cls ? '<span class="'+cls+'">'+esc(s)+'</span>' : esc(s); }
+  if (reduce){ el.innerHTML = lines.map(function(l){return wrap(l[0],l[1]);}).join('\n'); return; }
+  var li = 0, ci = 0, out = '';
+  function step(){
+    if (li >= lines.length){ el.innerHTML = out; return; }
+    var cls = lines[li][0], txt = lines[li][1];
+    ci += (li === 0 ? 1 : 3);
+    var cur = txt.slice(0, ci);
+    el.innerHTML = out + wrap(cls, cur) + '<span class="cursor"></span>';
+    if (ci >= txt.length){ out += wrap(cls, txt) + '\n'; li++; ci = 0; setTimeout(step, li === 1 ? 420 : 140); }
+    else setTimeout(step, li === 0 ? 38 : 9);
+  }
+  setTimeout(step, 500);
+})();
+</script>
+</body>
+</html>

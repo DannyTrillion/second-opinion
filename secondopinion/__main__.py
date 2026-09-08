@@ -44,6 +44,27 @@ def cmd_cost(a: argparse.Namespace) -> int:
     return 0
 
 
+DEMO = [
+    ("A momentum buy on SOL, replayed on 27 Aug 2026 (SOL +6.9%, 20-day breakout)",
+     dict(symbol="SOL", side="BUY", notional=100, thesis="strong momentum, SOL just broke out", as_of="2026-08-27")),
+    ("The same thesis on ETH today, where no breakout exists on the chart",
+     dict(symbol="ETH", side="BUY", notional=50, thesis="momentum breakout", as_of=None)),
+    ("A dip buy on BTC after three red days, replayed on 12 Aug 2026",
+     dict(symbol="BTCUSDT", side="BUY", notional=100, thesis="buy the dip", as_of="2026-08-12")),
+]
+
+
+def cmd_demo(a: argparse.Namespace) -> int:
+    from .service import second_opinion
+    for i, (title, kw) in enumerate(DEMO, 1):
+        print("\n[%d/%d] %s" % (i, len(DEMO), title))
+        print("-" * 72)
+        v = second_opinion(kw["symbol"], kw["side"], kw["notional"], thesis=kw["thesis"], as_of=kw["as_of"], offline=a.offline)
+        print(v.summary())
+    print("\naudit chain:", json.dumps(audit.verify()))
+    return 0
+
+
 def cmd_serve(a: argparse.Namespace) -> int:
     from .mcp.server import serve
     serve()
@@ -114,6 +135,8 @@ def main(argv=None) -> int:
     k.add_argument("symbol"); k.add_argument("notional", type=float); k.add_argument("--offline", action="store_true")
     k.set_defaults(fn=cmd_cost)
 
+    d = sub.add_parser("demo", help="play the three reference scenarios")
+    d.add_argument("--offline", action="store_true"); d.set_defaults(fn=cmd_demo)
     sub.add_parser("serve", help="run the MCP server on stdio").set_defaults(fn=cmd_serve)
     sub.add_parser("hook", help="Claude Code PreToolUse hook (reads stdin)").set_defaults(fn=cmd_hook)
 

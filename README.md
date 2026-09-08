@@ -1,5 +1,7 @@
 # Second Opinion
 
+[![tests](https://github.com/DannyTrillion/second-opinion/actions/workflows/tests.yml/badge.svg)](https://github.com/DannyTrillion/second-opinion/actions/workflows/tests.yml)
+
 **Every trade an AI proposes gets its base rate before Binance Agent OS executes it.**
 
 Binance's own MCP documentation warns that an agent "can make mistakes, act on outdated or hallucinated information, or send incorrect parameters, always verify before execution." Every guardrail built so far verifies the *order*: size caps, slippage collars, symbol allowlists. Nothing verifies the *reasoning*. When an agent says "buy SOL, momentum is strong," nothing checks whether that setup has ever paid.
@@ -100,7 +102,8 @@ python3 -m secondopinion rates BNBUSDT
 # round-trip cost for a size, from the live book
 python3 -m secondopinion cost BTCUSDT 250
 
-# run the tests (35, offline)
+# play the three reference scenarios, then run the tests (35, offline)
+python3 -m secondopinion demo --offline
 python3 -m unittest discover -s tests -v
 ```
 

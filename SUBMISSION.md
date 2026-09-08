@@ -1,34 +1,63 @@
 # Track A submission
 
-Quote-repost https://x.com/binance/status/2094810011557838988 with the video attached and this text:
+Quote-repost this: https://x.com/binance/status/2094810011557838988
+
+Attach the video to the first post. Put the poster on the second. Everything is under 280 characters so it works on a standard account. Post the lead, then reply to yourself with each of the following in order.
 
 ---
 
-Track A submission: Second Opinion, a deterministic adversary for AI trading agents on @Binance Agent OS.
+**1. Lead (attach the video)**
 
-The problem: every guardrail verifies the order. None verifies the reasoning. When an agent says "buy SOL, momentum is strong," nothing checks whether that setup has ever paid.
+I built a fact-checker for AI trading agents on @binance Agent OS.
 
-Second Opinion does, before the Binance MCP server executes:
+Every guardrail out there checks the order. None of them check the reasoning. When an agent says "buy SOL, momentum's strong," nothing asks: has that ever worked?
 
-• Is the claimed setup actually on the chart? If not, hallucinated thesis, hard veto.
-• What happened the last N times this setup appeared on this symbol? Median, hit rate, sample size, 95% CI, no lookahead.
-• Does the edge survive fees plus live order-book impact, both legs?
-
-Real example, replayed on 27 Aug: SOL +6.9%, 20-day breakout, agent says momentum. Last 80 times: median 3-day return −1.5%, paid 40% of the time. Veto, with the numbers.
-
-Agent OS both ways: an MCP server any client can call, and a Claude Code hook that fires on every binance-mcp-server order tool so the check cannot be skipped. Fail closed. Verbatim transcripts of it blocking orders inside Claude Code, including against the real Agent OS server, are in the repo. Approved orders still hit Binance's confirm-before-execute.
-
-Across 20 Binance markets: three green days in a row has never paid after cost (lost in 8), three red days paid in 5 and lost in 0. Chasing strength is the setup to be most suspicious of, and it is the one AIs reach for by name.
-
-Then I tested the gate itself, walk-forward, on 5,568 days across 8 symbols: the 742 strength-chasing trades it vetoed lost a median 0.68% out of sample. Its approvals did no better than average, and it is wrong about dip buys. Both are in the README, untuned.
-
-Measured, not predicted. 45 offline tests on committed real data, byte-identical decisions with a pinned hash, hash-chained audit log. No keys, no scopes, public data only.
-
-Code: https://github.com/DannyTrillion/second-opinion
-
-#BinanceAgentOS #AgentOS #MCP
+Second Opinion does. Track A entry, 90 seconds:
 
 ---
 
-Then complete the survey: https://www.binance.com/en/survey/2913aa200aac462c89a737779393f3d4
-Choose Track A, paste the quote-post link, use your main-account UID.
+**2. The idea (attach the poster)**
+
+It asks three questions before the exchange sees the order:
+
+Is the setup the AI is claiming actually on the chart?
+The last 80 times this coin looked like this, what happened next?
+Does whatever's left survive fees and the order book?
+
+Then: yes, maybe, or no. With every number.
+
+---
+
+**3. The real server**
+
+Today I connected it to the real Binance Agent OS server, read-only, and told Claude to place the order no matter what.
+
+Claude tried. A Claude Code hook ran Second Opinion first, remembered the thesis, found no momentum on the chart, and blocked it before Binance ever saw it.
+
+Transcript's in the repo.
+
+---
+
+**4. The evidence**
+
+I didn't want to just claim it works.
+
+20 Binance markets: buying three green days in a row has never paid after fees. Three red days has, five times.
+
+Then I ran the gate itself day by day over 5,568 days. The momentum trades it blocked lost. Its approvals were no better than average. Both are in the README, untouched.
+
+---
+
+**5. What it's made of**
+
+Stock Python, no dependencies, no API keys, no LLM inside. 45 tests on real data that's committed in the repo, so anyone gets the same answers. Every decision hash-chained.
+
+Code: github.com/DannyTrillion/second-opinion
+Site: dannytrillion.github.io/second-opinion
+
+#BinanceAgentOS
+
+---
+
+Then the survey: https://www.binance.com/en/survey/2913aa200aac462c89a737779393f3d4
+Track A, your main-account UID, the link to post 1.

@@ -2,12 +2,12 @@
 
 Record with QuickTime (File > New Screen Recording). Terminal font 18 pt, dark theme, window about 100 x 30.
 Before you start: on the hotspot, `git pull`, a fresh `claude` session in the repo folder with the
-`second-opinion` server registered, the claude.ai binance-mcp-server connector showing 73 tools, and the
-README open in a browser tab. Speak plainly. One idea per scene. Rule for every scene: type first, then talk over the output.
+`second-opinion` server registered, the claude.ai binance-mcp-server connector showing 73 tools, and three
+browser tabs: the landing page, the Binance docs at Risks, and the README. Speak plainly. One idea per scene. Rule for every scene: type first, then talk over the output.
 
 ## Scene 1, 0:00 to 0:12. The problem
 
-On screen: Binance's MCP docs, the Risks paragraph highlighted.
+On screen: the landing page at https://dannytrillion.github.io/second-opinion/ for the first sentence, then switch to Binance's MCP docs, the Risks paragraph highlighted, for the rest.
 
 Say, over the page: "Hi, I'm Daniel. This is Second Opinion, a fact-checker for AI trading agents, built on Binance Agent OS. Here's the problem. Binance's own docs say an AI agent can act on hallucinated information. And every guardrail out there checks the order. How big, how fast, which coin. Nobody checks the reasoning. So when an agent says 'buy SOL, momentum looks strong', nothing asks: has that ever actually worked?"
 

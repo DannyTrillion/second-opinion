@@ -25,7 +25,7 @@
 
   /* hero */
   header{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
-  #tape{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.55}
+  #tape{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.8}
   header .wrap{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding-top:88px;padding-bottom:88px}
   h1{font-family:var(--display);font-weight:300;font-size:clamp(40px,5.2vw,68px);line-height:1.04;letter-spacing:-.02em;margin:18px 0 22px;text-wrap:balance}
   h1 em{font-style:italic;color:var(--accent-2)}
@@ -35,7 +35,7 @@
   .btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#14161a}.btn.primary:hover{background:var(--accent-2);color:#14161a}
   .btn code{font-family:var(--mono);font-size:13px;color:inherit}
-  .stats{display:flex;gap:28px;margin-top:34px;flex-wrap:wrap}
+  .stats{display:grid;grid-template-columns:repeat(3,auto);gap:28px;margin-top:34px;justify-content:start}
   .stat b{display:block;font-family:var(--display);font-weight:500;font-size:28px;color:var(--text);line-height:1;font-variant-numeric:tabular-nums}
   .stat span{font-size:13px;color:var(--dim)}
 
@@ -249,8 +249,8 @@ python3 -m secondopinion check SOL buy 100 --thesis "momentum"</span>
     for (var i=0;i<n;i++){
       var x = -60 + i*gw - drift, o=cs[i][0], h=cs[i][1], l=cs[i][2], cl=cs[i][3];
       var up = cl >= o, sig = (i === data.sig);
-      ctx.strokeStyle = sig ? 'rgba(226,177,76,.9)' : (up ? 'rgba(127,207,154,.22)' : 'rgba(240,138,130,.22)');
-      ctx.fillStyle = sig ? 'rgba(226,177,76,.55)' : (up ? 'rgba(127,207,154,.12)' : 'rgba(240,138,130,.12)');
+      ctx.strokeStyle = sig ? 'rgba(226,177,76,.9)' : (up ? 'rgba(127,207,154,.34)' : 'rgba(240,138,130,.34)');
+      ctx.fillStyle = sig ? 'rgba(226,177,76,.55)' : (up ? 'rgba(127,207,154,.18)' : 'rgba(240,138,130,.18)');
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(x+gw/2, y(h)); ctx.lineTo(x+gw/2, y(l)); ctx.stroke();
       var top = y(Math.max(o,cl)), bh = Math.max(1, Math.abs(y(o)-y(cl)));

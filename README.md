@@ -4,6 +4,8 @@
 
 **Every trade an AI proposes gets its base rate before Binance Agent OS executes it.**
 
+**Demo video (90 s):** https://youtu.be/cv1XzbzABII · **Site:** https://dannytrillion.github.io/second-opinion/
+
 Binance's own MCP documentation warns that an agent "can make mistakes, act on outdated or hallucinated information, or send incorrect parameters, always verify before execution." Every guardrail built so far verifies the *order*: size caps, slippage collars, symbol allowlists. Nothing verifies the *reasoning*. When an agent says "buy SOL, momentum is strong," nothing checks whether that setup has ever paid.
 
 Second Opinion is a deterministic, zero-LLM adversary that sits between the AI and the Binance MCP server. For each proposed trade it answers three questions from real Binance history and the live order book:

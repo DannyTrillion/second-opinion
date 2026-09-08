@@ -54,6 +54,7 @@ Stock Python, no dependencies, no API keys, no LLM inside. 45 tests on real data
 
 Code: github.com/DannyTrillion/second-opinion
 Site: dannytrillion.github.io/second-opinion
+Video: youtu.be/cv1XzbzABII
 
 #BinanceAgentOS
 

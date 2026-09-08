@@ -120,7 +120,7 @@ Both findings are left in the code and the tables rather than tuned away, becaus
 **Two ways in, and they cannot disagree because they share one code path.**
 
 - **As an MCP server.** Register it beside `binance-mcp-server`. Any client can call `second_opinion` before it calls an order tool. Five tools: `second_opinion`, `base_rates`, `cost_estimate`, `list_setups`, `audit_log`.
-- **As a Claude Code hook.** A `PreToolUse` hook on `mcp__binance-mcp-server__.*` runs Second Opinion on every order the model tries to place. `VETO` denies the call and the model sees why. `CAUTION` also denies by default and tells the model to bring the numbers to you, because in a headless run (`claude -p`, cron, CI) a permission prompt cannot block and the order would go through; set `SECOND_OPINION_CAUTION=ask` in interactive sessions if you prefer a prompt. `APPROVE` allows it and attaches the receipt. Read-only tools pass silently. Anything the hook cannot parse asks; it never silently allows an unknown shape. Approved orders still go through Binance's own confirm-before-execute step.
+- **As a Claude Code hook.** A `PreToolUse` hook on `mcp__binance-mcp-server__.*` runs Second Opinion on every order the model tries to place: `spot_newOrder`, `margin_marginAccountNewOrder`, `convert_sendQuoteRequest`, `convert_placeLimitOrder`, and anything routed through the server's `tool_execute` proxy, which is unwrapped and judged as the inner call. A convert quote can only be accepted if the quote request was approved in the last 15 minutes. `VETO` denies the call and the model sees why. `CAUTION` also denies by default and tells the model to bring the numbers to you, because in a headless run (`claude -p`, cron, CI) a permission prompt cannot block and the order would go through; set `SECOND_OPINION_CAUTION=ask` in interactive sessions if you prefer a prompt. `APPROVE` allows it and attaches the receipt. Read-only tools pass silently. Anything the hook cannot parse asks; it never silently allows an unknown shape. Approved orders still go through Binance's own confirm-before-execute step.
 
 Second Opinion holds no keys and no scopes. It reads public market data only. The Binance MCP server keeps the account.
 
@@ -142,7 +142,7 @@ python3 -m secondopinion rates BNBUSDT
 # round-trip cost for a size, from the live book
 python3 -m secondopinion cost BTCUSDT 250
 
-# play the three reference scenarios, then run the tests (39, offline)
+# play the three reference scenarios, then run the tests (45, offline)
 python3 -m secondopinion demo --offline
 python3 -m unittest discover -s tests -v
 ```
@@ -166,7 +166,7 @@ python3 -m secondopinion install-hook            # prints the settings block
 python3 -m secondopinion install-hook --apply    # merges it into ~/.claude/settings.json, keeps a .bak
 ```
 
-Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first. [docs/HOOK_TRANSCRIPT.md](docs/HOOK_TRANSCRIPT.md) is a verbatim transcript of the hook vetoing a momentum buy inside a real Claude Code session.
+Then, in a Claude Code session with the Binance MCP server connected, ask for a trade. If the model calls an order tool, the hook runs first. The real order tools have no rationale field, so the hook recalls the thesis the model gave `second_opinion` for the same symbol and side in the last 15 minutes; the two entry points work together. [docs/HOOK_TRANSCRIPT.md](docs/HOOK_TRANSCRIPT.md) is a verbatim transcript of the hook vetoing a momentum buy inside a real Claude Code session.
 
 Set `SECOND_OPINION_MODE=advisory` to make the hook never deny, only ask with the receipt attached.
 
@@ -216,7 +216,7 @@ Every decision, whether from the CLI, the MCP server, or the hook, is appended t
 - It does not predict. A base rate is what happened, not what will happen. A 62% hit rate on 109 occurrences is a tilt, not a promise, and the output says so.
 - Daily bars only, up to 1,000 of them. Intraday setups are out of scope; the MCP server's candle tool can be swapped in later.
 - Spot pricing only. Futures funding is not modelled; a perp position's carry is a separate question.
-- The hook classifies Binance MCP tools by name. Binance has not published the tool schema, so unknown names ask rather than allow. `scripts/probe_binance_mcp.py` asks the real endpoint for its `tools/list` and writes it to a file; with that in hand the matcher can be made exact.
+- The hook matches the real server's 73 tools by exact name ([docs/BINANCE_MCP_TOOLS.md](docs/BINANCE_MCP_TOOLS.md), observed through an authenticated connector on 8 September 2026, since Binance has not published the list). Names outside that catalog fall back to heuristics and, if still unrecognised, ask rather than allow. `scripts/probe_binance_mcp.py` re-fetches the list when Binance changes it.
 - Headless agents are the reason CAUTION denies. A hook decision of "ask" only holds when a human is at the keyboard; in `claude -p` the call proceeds. That was found by running `scripts/try_hook.sh`, and it is why the default is deny.
 - No live trade is in this repository. The demo shows the veto and approve paths on live data and the hook firing inside Claude Code; the account was not funded during the hackathon window.
 
@@ -235,12 +235,13 @@ secondopinion/
   service.py           the one entry point the CLI, server and hook all use
   mcp/server.py        stdio JSON-RPC MCP server, 5 tools
   hook/pretooluse.py   Claude Code PreToolUse hook, fail closed
+  hook/binance_tools.py the real server's tool catalog, matched exactly
   audit.py             hash-chained JSONL log
   __main__.py          CLI
 fixtures/              up to 1,000 real daily bars for 20 USDT pairs; a depth snapshot; exchange filters
-docs/                  EVIDENCE.md (what paid where), EVALUATION.md (walk-forward test of the gate), HOOK_TRANSCRIPT.md (the hook firing in Claude Code)
+docs/                  EVIDENCE.md, EVALUATION.md, HOOK_TRANSCRIPT.md, BINANCE_MCP_TOOLS.md (the real server's 73 tools)
 skills/                Skills Hub packaging
-tests/                 39 tests, all offline
+tests/                 45 tests, all offline
 hooks/                 Claude Code settings example
 examples/              stand-in Binance MCP server for demos
 scripts/try_hook.sh    watch the hook fire in a real Claude Code session, no account needed

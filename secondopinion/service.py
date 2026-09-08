@@ -66,7 +66,7 @@ def second_opinion(symbol: str, side: str, notional_usd: float, thesis: Optional
     if log:
         audit.append({"origin": origin, "verdict": v.verdict, "symbol": v.symbol, "side": v.side,
                       "notional_usd": v.notional_usd, "primary_setup": v.primary_setup,
-                      "edge_after_cost_bps": v.edge_after_cost_bps, "as_of": as_of,
+                      "edge_after_cost_bps": v.edge_after_cost_bps, "as_of": as_of, "thesis": thesis,
                       "body_sha256": v.body_sha256, "reasons": v.reasons})
     return v
 

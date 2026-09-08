@@ -154,3 +154,75 @@ class TestAudit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRealBinanceCatalog(unittest.TestCase):
+    """Against the 75-tool catalog observed on the real Agent OS server on 8 Sep 2026."""
+
+    def out(self, payload):
+        return hook.decide(payload)["hookSpecificOutput"]
+
+    def test_exact_categories(self):
+        c = hook.classify
+        P = "mcp__binance-mcp-server__"
+        self.assertEqual(c(P + "spot_newOrder"), "order")
+        self.assertEqual(c(P + "margin_marginAccountNewOrder"), "order")
+        self.assertEqual(c(P + "convert_sendQuoteRequest"), "order")
+        self.assertEqual(c(P + "convert_placeLimitOrder"), "order")
+        self.assertEqual(c(P + "convert_acceptQuote"), "order_accept")
+        self.assertEqual(c(P + "spot_deleteOpenOrders"), "cancel")
+        self.assertEqual(c(P + "wallet_userUniversalTransfer"), "transfer")
+        self.assertEqual(c(P + "tool_execute"), "proxy")
+        for t in ("spot_getAccount", "spot_myTrades", "wallet_depositAddress", "wallet_withdrawHistory",
+                  "futures_usds_positionInformationV2", "analysis_getTokenAiReport", "tool_search"):
+            self.assertEqual(c(P + t), "read", t)
+        from secondopinion.hook.binance_tools import ALL
+        self.assertEqual(len(ALL), 73)
+
+    def test_spot_newOrder_over_cap_denied(self):
+        h = self.out({"tool_name": "mcp__binance-mcp-server__spot_newOrder",
+                      "tool_input": {"symbol": "ETHUSDT", "side": "BUY", "type": "MARKET", "quoteOrderQty": 5000}})
+        self.assertEqual(h["permissionDecision"], "deny")
+        self.assertIn("max_notional", h["permissionDecisionReason"])
+
+    def test_tool_execute_proxy_is_unwrapped(self):
+        h = self.out({"tool_name": "mcp__binance-mcp-server__tool_execute",
+                      "tool_input": {"toolName": "spot_newOrder",
+                                     "arguments": {"symbol": "ETHUSDT", "side": "BUY", "type": "MARKET", "quoteOrderQty": 5000}}})
+        self.assertEqual(h["permissionDecision"], "deny")
+        self.assertIn("max_notional", h["permissionDecisionReason"])
+        h = self.out({"tool_name": "mcp__binance-mcp-server__tool_execute",
+                      "tool_input": {"toolName": "spot_ticker24hr", "arguments": {"symbol": "BTCUSDT"}}})
+        self.assertEqual(h["permissionDecision"], "allow")
+        h = self.out({"tool_name": "mcp__binance-mcp-server__tool_execute", "tool_input": {}})
+        self.assertEqual(h["permissionDecision"], "ask")
+
+    def test_convert_quote_shapes(self):
+        p = hook.parse_order
+        o, _ = p("x__convert_sendQuoteRequest", {"fromAsset": "USDT", "toAsset": "BNB", "fromAmount": 50})
+        self.assertEqual((o["symbol"], o["side"], o["notional_usd"]), ("BNBUSDT", "BUY", 50.0))
+        o, _ = p("x__convert_sendQuoteRequest", {"fromAsset": "BNB", "toAsset": "USDT", "toAmount": 75})
+        self.assertEqual((o["symbol"], o["side"], o["notional_usd"]), ("BNBUSDT", "SELL", 75.0))
+        o, _ = p("x__convert_placeLimitOrder", {"baseAsset": "SOL", "quoteAsset": "USDT", "side": "BUY", "limitPrice": 100, "baseAmount": 2, "expiredType": "1_D"})
+        self.assertEqual((o["symbol"], o["side"], o["notional_usd"]), ("SOLUSDT", "BUY", 200.0))
+
+    def test_accept_quote_requires_a_recent_allowed_quote(self):
+        h = self.out({"tool_name": "mcp__binance-mcp-server__convert_acceptQuote", "tool_input": {"quoteId": "q1"}})
+        self.assertEqual(h["permissionDecision"], "deny")
+        # a vetoed quote request (over cap) must not unlock acceptance
+        self.out({"tool_name": "mcp__binance-mcp-server__convert_sendQuoteRequest",
+                  "tool_input": {"fromAsset": "USDT", "toAsset": "ETH", "fromAmount": 5000}})
+        h = self.out({"tool_name": "mcp__binance-mcp-server__convert_acceptQuote", "tool_input": {"quoteId": "q1"}})
+        self.assertEqual(h["permissionDecision"], "deny")
+        # an allowed quote request does
+        audit.append({"origin": "hook", "tool": "mcp__binance-mcp-server__convert_sendQuoteRequest", "kind": "order", "decision": "allow"})
+        h = self.out({"tool_name": "mcp__binance-mcp-server__convert_acceptQuote", "tool_input": {"quoteId": "q1"}})
+        self.assertEqual(h["permissionDecision"], "allow")
+
+    def test_thesis_is_recalled_from_a_prior_second_opinion_call(self):
+        from secondopinion.service import second_opinion
+        # the model asked second_opinion() with a thesis; the real order tool has no rationale field
+        second_opinion("ETHUSDT", "BUY", 50, thesis="momentum breakout", origin="mcp")
+        h = self.out({"tool_name": "mcp__binance-mcp-server__spot_newOrder",
+                      "tool_input": {"symbol": "ETHUSDT", "side": "BUY", "type": "MARKET", "quoteOrderQty": 50}})
+        self.assertIn("claimed: BIG_UP_DAY", h["permissionDecisionReason"])

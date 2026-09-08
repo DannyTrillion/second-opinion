@@ -22,7 +22,7 @@ Across 20 Binance markets: three green days in a row has never paid after cost (
 
 Then I tested the gate itself, walk-forward, on 5,568 days across 8 symbols: the 742 strength-chasing trades it vetoed lost a median 0.68% out of sample. Its approvals did no better than average, and it is wrong about dip buys. Both are in the README, untuned.
 
-Measured, not predicted. 39 offline tests on committed real data, byte-identical decisions with a pinned hash, hash-chained audit log. No keys, no scopes, public data only.
+Measured, not predicted. 45 offline tests on committed real data, byte-identical decisions with a pinned hash, hash-chained audit log. No keys, no scopes, public data only.
 
 Code: https://github.com/DannyTrillion/second-opinion
 

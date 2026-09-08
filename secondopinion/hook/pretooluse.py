@@ -18,8 +18,11 @@ import re
 import sys
 from typing import Any, Dict, Optional, Tuple
 
+import time
+
 from .. import audit
 from ..service import make_data, normalize_symbol, second_opinion
+from .binance_tools import category
 
 READ_WORDS = ("get", "list", "query", "fetch", "read", "show", "search", "describe", "history", "status",
               "balance", "ticker", "kline", "candle", "depth", "book", "price", "funding", "position", "info", "time")
@@ -34,7 +37,14 @@ BASE_QTY_KEYS = ("quantity", "qty", "amount", "size", "base_qty", "fromamount", 
 PRICE_KEYS = ("price", "limit_price")
 
 
+def bare(tool_name: str) -> str:
+    return tool_name.split("__")[-1]
+
+
 def classify(tool_name: str) -> str:
+    exact = category(bare(tool_name))
+    if exact:
+        return exact
     n = tool_name.lower().split("__")[-1]
     if any(w in n for w in CANCEL_WORDS):
         return "cancel"
@@ -80,22 +90,37 @@ def parse_order(tool_name: str, tool_input: Dict[str, Any], price_lookup=None) -
     from_asset, to_asset = _pick(flat, ("fromasset", "from_asset", "from")), _pick(flat, ("toasset", "to_asset", "to"))
     stables = ("USDT", "USDC", "FDUSD", "TUSD", "BUSD")
     convert_from_amount = None
+    base_asset, quote_asset = _pick(flat, ("baseasset", "base_asset")), _pick(flat, ("quoteasset", "quote_asset"))
+    if not symbol and base_asset and quote_asset:
+        symbol = str(base_asset).upper() + str(quote_asset).upper()
+        qa, ba, lp = _pick(flat, ("quoteamount", "quote_amount")), _pick(flat, ("baseamount", "base_amount")), _pick(flat, ("limitprice", "limit_price"))
+        try:
+            if qa is not None:
+                return {"symbol": normalize_symbol(symbol), "side": str(side or "BUY").upper(), "notional_usd": float(qa), "how": "convert limit: quote amount"}, ""
+            if ba is not None and lp is not None:
+                return {"symbol": normalize_symbol(symbol), "side": str(side or "BUY").upper(), "notional_usd": float(ba) * float(lp), "how": "convert limit: base amount x limit price"}, ""
+        except (TypeError, ValueError) as e:
+            return None, "could not read convert limit amounts: %s" % e
     if not symbol and from_asset and to_asset:
         fa, ta = str(from_asset).upper(), str(to_asset).upper()
         amt = _pick(flat, ("fromamount", "from_amount", "amount"))
-        if fa in stables:
-            symbol, side = ta + fa, "BUY"
-            if amt is not None:
-                try:
+        to_amt = _pick(flat, ("toamount", "to_amount"))
+        try:
+            if fa in stables:
+                symbol, side = ta + fa, "BUY"
+                if amt is not None:
                     return {"symbol": normalize_symbol(symbol), "side": side, "notional_usd": float(amt), "how": "convert: %s amount is the quote notional" % fa}, ""
-                except (TypeError, ValueError) as e:
-                    return None, "could not read convert amount: %s" % e
-        elif ta in stables:
-            symbol, side = fa + ta, "SELL"
-            convert_from_amount = amt
-        else:
-            symbol, side = ta + fa, "BUY"
-            convert_from_amount = amt
+                convert_from_amount = to_amt   # amount of the asset being bought
+            elif ta in stables:
+                symbol, side = fa + ta, "SELL"
+                if to_amt is not None:
+                    return {"symbol": normalize_symbol(symbol), "side": side, "notional_usd": float(to_amt), "how": "convert: %s amount is the quote notional" % ta}, ""
+                convert_from_amount = amt
+            else:
+                symbol, side = ta + fa, "BUY"
+                convert_from_amount = amt
+        except (TypeError, ValueError) as e:
+            return None, "could not read convert amount: %s" % e
     if not side:
         if "buy" in n:
             side = "BUY"
@@ -124,9 +149,42 @@ def parse_order(tool_name: str, tool_input: Dict[str, Any], price_lookup=None) -
     return None, "no quantity or notional in tool input keys %s" % sorted(tool_input.keys())
 
 
+RECENT_S = 15 * 60
+
+
+def _recent(pred, limit: int = 200):
+    """Most recent audit entry satisfying pred, within RECENT_S seconds, else None."""
+    now = time.time()
+    for rec in reversed(audit.read(limit)):
+        try:
+            ts = time.mktime(time.strptime(rec["ts"], "%Y-%m-%dT%H:%M:%SZ")) - time.timezone
+        except Exception:
+            continue
+        if now - ts > RECENT_S:
+            break
+        if pred(rec.get("entry", {})):
+            return rec
+    return None
+
+
 def decide(payload: Dict[str, Any]) -> Dict[str, Any]:
     tool = payload.get("tool_name", "")
     tool_input = payload.get("tool_input") or {}
+    # tool_execute can invoke any other tool by name: judge the inner call, not the wrapper
+    if classify(tool) == "proxy":
+        inner = tool_input.get("toolName") or tool_input.get("tool_name") or tool_input.get("name")
+        if not inner:
+            audit.append({"origin": "hook", "tool": tool, "kind": "proxy", "decision": "ask", "input": tool_input})
+            return {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "ask",
+                    "permissionDecisionReason": "Second Opinion: tool_execute without a toolName; confirm manually."}}
+        inner_input = tool_input.get("arguments") or tool_input.get("args") or {}
+        if isinstance(inner_input, str):
+            try:
+                inner_input = json.loads(inner_input)
+            except json.JSONDecodeError:
+                inner_input = {}
+        prefix = tool.rsplit("__", 1)[0] + "__" if "__" in tool else ""
+        return decide({"tool_name": prefix + str(inner), "tool_input": inner_input, "via": tool})
     kind = classify(tool)
     advisory = os.environ.get("SECOND_OPINION_MODE", "").lower() == "advisory"
 
@@ -146,6 +204,14 @@ def decide(payload: Dict[str, Any]) -> Dict[str, Any]:
     if kind == "unknown":
         audit.append({"origin": "hook", "tool": tool, "kind": kind, "decision": "ask", "input": tool_input})
         return out("ask", "Second Opinion does not recognise tool '%s'; confirm manually." % tool)
+    if kind == "order_accept":
+        # convert_acceptQuote carries only a quoteId; it executes the quote judged at convert_sendQuoteRequest
+        prior = _recent(lambda e: e.get("origin", "").startswith("hook") and bare(e.get("tool", "")) == "convert_sendQuoteRequest")
+        if prior and prior["entry"].get("decision") == "allow":
+            audit.append({"origin": "hook", "tool": tool, "kind": kind, "decision": "allow", "judged_by": prior["line_sha256"], "input": tool_input})
+            return out("allow", context="Second Opinion: accepting a convert quote that was judged APPROVE %s." % prior["ts"])
+        audit.append({"origin": "hook", "tool": tool, "kind": kind, "decision": "deny", "input": tool_input})
+        return out("deny", "Second Opinion: no approved convert quote in the last %d minutes. Request the quote first (convert_sendQuoteRequest) so it can be judged; a quote that was vetoed cannot be accepted." % (RECENT_S // 60))
 
     data = make_data()
     order, note = parse_order(tool, tool_input, price_lookup=lambda s: data.last_price(s))
@@ -154,6 +220,11 @@ def decide(payload: Dict[str, Any]) -> Dict[str, Any]:
         return out("ask", "Second Opinion could not parse this order (%s). Confirm manually or call the second_opinion tool first." % note)
 
     thesis = os.environ.get("SECOND_OPINION_THESIS") or _pick(_flat(tool_input, {}), ("thesis", "reason", "rationale", "note", "comment"))
+    if not thesis:
+        # the real order tools carry no rationale field; recall the one the model gave second_opinion() for this trade
+        prior = _recent(lambda e: e.get("origin") == "mcp" and e.get("symbol") == order["symbol"] and e.get("side") == order["side"] and e.get("thesis"))
+        if prior:
+            thesis = prior["entry"]["thesis"]
     try:
         v = second_opinion(order["symbol"], order["side"], order["notional_usd"], thesis=thesis, origin="hook:" + tool)
     except Exception as e:
@@ -162,6 +233,10 @@ def decide(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     receipt = "Second Opinion (%s, notional %s):\n%s" % (order["how"], "$%.2f" % order["notional_usd"], v.summary())
     caution_mode = os.environ.get("SECOND_OPINION_CAUTION", "deny").lower()
+    decision = "allow" if v.verdict == "APPROVE" else ("ask" if (advisory or (v.verdict == "CAUTION" and caution_mode == "ask")) else "deny")
+    audit.append({"origin": "hook", "tool": tool, "kind": "order", "decision": decision, "verdict": v.verdict,
+                  "symbol": v.symbol, "side": v.side, "notional_usd": v.notional_usd, "body_sha256": v.body_sha256,
+                  "via": payload.get("via")})
     if v.verdict == "APPROVE":
         return out("allow", context=receipt)
     if advisory:

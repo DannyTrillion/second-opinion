@@ -25,13 +25,14 @@ $ python3 -m secondopinion check SOL buy 100 --thesis "strong momentum, SOL just
 VETO  BUY SOLUSDT  $100.00  horizon 3d
 claimed: BIG_UP_DAY, THREE_UP, BREAKOUT_20D; on the chart: BIG_UP_DAY, BREAKOUT_20D, RSI_OVERBOUGHT, ABOVE_SMA50
 setup BIG_UP_DAY: n=80, median -1.51%, hit 40%, CI95 median [-3.17%, +0.15%]
+same setup by horizon (median/hit): 1d +0.21%/54%, 3d -1.51%/40%, 7d -1.23%/46%
 all days: n=985, median +0.13%, hit 51%
 round trip cost 30.0 bps (assumed)
 edge after cost -181.2 bps (CI low -346.6 bps)
 - edge_after_cost: observed -181.19, limit 0.0 (bps)
 - edge_ci_low: observed -346.62, limit 0.0 (bps (lower 95% bound))
 - hit_rate: observed 0.4, limit 0.5 (share of past occurrences that paid)
-body sha256 04d82487640e7575
+body sha256 b0c8b71a0b21799b
 ```
 
 The chart really did show a big up day and a breakout. The problem is what followed the previous 80 of them: SOL lost a median 1.5% over the next three days and paid only 40% of the time. (What actually followed: SOL closed at $109.14 on 27 August and $101.75 three days later, -6.8%.)
@@ -45,12 +46,13 @@ claimed: BIG_UP_DAY, THREE_UP, BREAKOUT_20D; on the chart: ABOVE_SMA50
 - thesis_present: observed none of ['BIG_UP_DAY', 'THREE_UP', 'BREAKOUT_20D'], limit at least one claimed setup on the signal bar (setups) - the stated rationale does not match what the chart shows
 ```
 
-And a dip buy after three red days on BTC, which is the one pattern that has paid on BTC, SOL and BNB alike:
+And a dip buy after three red days on BTC. Three red days is the one setup with a positive median on all four majors, and it clears the cost bar with confidence on five of the twenty markets tested below:
 
 ```
 $ python3 -m secondopinion check BTCUSDT buy 100 --thesis "buy the dip" --as-of 2026-08-12
 CAUTION  BUY BTCUSDT  $100.00  horizon 3d
 setup THREE_DOWN: n=109, median +0.96%, hit 62%, CI95 median [+0.15%, +1.80%]
+same setup by horizon (median/hit): 1d +0.56%/60%, 3d +0.96%/62%, 7d +0.95%/58%
 edge after cost +65.7 bps (CI low -14.8 bps)
 - positive median edge but the 95% interval straddles zero; this is a coin flip with a small tilt
 ```
@@ -70,7 +72,7 @@ Running the same base rates over 20 USDT pairs (up to 1,000 daily bars each, thr
 
 "Paid" means the lower 95% bound on the median 3-day return clears a 30 bps round trip; "lost" means the upper bound does not reach it. Chasing strength has not paid anywhere in this sample. Buying three red days has, on SOL, LINK, LTC, PEPE and TON. This is exactly the pattern an AI's language runs against: "momentum" sounds like a reason, and the record says it is the one setup to be most suspicious of.
 
-Every receipt now shows the primary setup at 1, 3 and 7 days, so a 3-day coin flip cannot hide a 7-day edge or loss:
+Every receipt shows the primary setup at 1, 3 and 7 days, so a 3-day coin flip cannot hide a 7-day edge or loss:
 
 ```
 setup BIG_UP_DAY: n=80, median -1.51%, hit 40%, CI95 median [-3.17%, +0.15%]
@@ -170,7 +172,7 @@ Set `SECOND_OPINION_MODE=advisory` to make the hook never deny, only ask with th
 
 ### As a skill
 
-[skills/second-opinion/SKILL.md](skills/second-opinion/SKILL.md) packages the same workflow as an agent skill in the Binance Skills Hub format: when to call `second_opinion`, how to read `thesis_present` first, and how to act on each verdict. Drop it into any client that loads skills, or point Claude Code at it with `claude skills add`.
+[skills/second-opinion/SKILL.md](skills/second-opinion/SKILL.md) packages the same workflow as an agent skill in the Binance Skills Hub format: when to call `second_opinion`, how to read `thesis_present` first, and how to act on each verdict. Copy the folder into any client that loads skills; for Claude Code that is `.claude/skills/second-opinion/` in your project.
 
 ## The setups
 
@@ -192,7 +194,7 @@ Base rate for a setup at horizon *h*: enter at the signal close, exit *h* comple
 | Check | Fails when | Effect |
 | --- | --- | --- |
 | `thesis_present` | none of the claimed setups is on the signal bar | VETO |
-| `max_notional`, `symbol_allowlist`, `symbol_trading`, `min_notional` | policy or exchange filter breached | VETO |
+| `positive_notional`, `max_notional`, `symbol_allowlist`, `symbol_trading`, `min_notional` | size not positive, policy or exchange filter breached | VETO |
 | `round_trip_cost`, `book_absorbs_size` | cost above policy cap, or visible depth cannot fill the size | VETO |
 | `data_freshness` | last completed bar older than the policy allows | VETO |
 | `evidence` | fewer than `min_sample` prior occurrences | CAUTION |

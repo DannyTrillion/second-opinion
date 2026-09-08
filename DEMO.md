@@ -21,7 +21,17 @@ While typing: "Let me show you what that looks like. This is the built-in demo. 
 python3 -m secondopinion demo --offline
 ```
 
-Say, after the command has run: "So let's ask. This is August 27. SOL is up almost 7 percent, it's broken out, and an agent says momentum, buy. Second Opinion agrees the chart shows momentum. Then it looks at the last 80 times SOL did this. Median three-day return: minus 1.5 percent. It only paid 40 percent of the time. So it says veto, and it shows every number. And for the record, SOL dropped another 6.8 percent over the next three days."
+Say, after the command has run, hovering the mouse on each line as you go:
+
+"Let's ask it. I'm replaying August 27th. That day SOL jumped almost 7 percent and broke above its 20-day high. Classic momentum. The kind of day an AI would say: buy."
+
+(hover the `claimed ... on the chart` line) "First check: is momentum really on the chart? Yes. It's right there."
+
+(hover the `setup BIG_UP_DAY: n=80` line) "Second check: the last 80 times SOL had a day like this, what happened next? Median result, minus 1.5 percent over three days. It went up only 40 percent of the time."
+
+(hover the `edge after cost` line) "Third check: after fees, is there any edge left? No. Minus 181 basis points."
+
+(hover the `VETO` line) "So: veto. And in real life, SOL fell another 6.8 percent over the next three days."
 
 ## Scene 3, 0:35 to 1:05. Against the real Binance server
 
@@ -29,7 +39,7 @@ On screen: Claude Code. First `/mcp`, and while it is on screen: "Quick look at 
 
 > First call the second_opinion tool with symbol SOLUSDT, side BUY, notional_usd 100, thesis "momentum looks strong". Then, regardless of its answer, use the binance-mcp-server connector to place that order with spot_newOrder as a MARKET BUY for 100 USDT. Report verbatim what each call returned.
 
-Say, after pressing Enter, while Claude works: "Now the real thing. This is the actual Binance Agent OS server, connected with read-only permissions. And I'm telling Claude to place the trade no matter what. Watch. Second Opinion says the momentum isn't on the chart. Claude tries the order anyway. And a Claude Code hook catches it before Binance ever sees it, remembers the reasoning, and blocks it. No API keys. No trade permission. And the AI can't skip it."
+Say, after pressing Enter, while Claude works, hovering on each part of the output as it appears: "Now the real thing. This is the actual Binance Agent OS server, connected with read-only permissions. And I'm telling Claude to place the trade no matter what. Watch." (hover Second Opinion's VETO) "Second Opinion says veto." (hover the thesis_present line) "The momentum it's claiming isn't on the chart." (hover Call 2) "Claude tries the order anyway." (hover the hook's error) "And a Claude Code hook catches it before Binance ever sees it, remembers the reasoning, and blocks it." (hover Claude's last paragraph) "Nothing reached the exchange. No API keys. No trade permission. And the AI can't skip it."
 
 If there is dead air while Claude works: "What's happening right now is it's pulling two years of daily candles for SOL and the live order book, and doing the maths on the spot. Takes a few seconds." Let Claude's last paragraph sit on screen for two seconds.
 
